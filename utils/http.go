@@ -38,7 +38,7 @@ func HttpPost(url string, header http.Header, data []byte) ([]byte, error) {
 	client := http.Client{}
 	do, err := client.Do(request)
 	if err != nil {
-		fmt.Println(err)
+		return nil,err
 	}
 	body := do.Body
 	all, err := ioutil.ReadAll(body)

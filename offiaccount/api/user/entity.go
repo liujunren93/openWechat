@@ -1,6 +1,6 @@
-package entity
+package user
 
-type UserListRes struct {
+type ListRes struct {
 	Total int `json:"total"`
 	Count int `json:"count"`
 	Data  struct {
@@ -9,7 +9,7 @@ type UserListRes struct {
 	NextOpenID string `json:"next_openid"`
 }
 
-type UserInfoRes struct {
+type InfoRes struct {
 	Subscribe int    `json:"subscribe"`
 	OpenID    string `json:"openid"`
 	NickName  string `json:"nickname"`

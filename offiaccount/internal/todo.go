@@ -16,12 +16,12 @@ import (
 type Todo struct {
 	retry int32
 	mutex sync.RWMutex
-	conf  *Config
+	Conf  *Config
 	store store.Store
 }
 
 func (t *Todo) SetConf(conf *Config) {
-	t.conf = conf
+	t.Conf = conf
 }
 func (t *Todo) SetStore(store store.Store) {
 	t.store = store
@@ -46,7 +46,6 @@ func ToDoFuncGet(api string, res interface{}, kv ...string) toDoFunc {
 			s := res.(*string)
 			*s=string(re)
 		default:
-			fmt.Println(string(re))
 			err = json.Unmarshal(re, &res)
 		}
 		return re, err
@@ -76,10 +75,10 @@ func ToDoFuncPost(api string, res interface{}, data []byte, kv ...string) toDoFu
 
 func (t *Todo) Do(f toDoFunc) error {
 	var errRes *ErrorRes
-	if t.conf == nil {
+	if t.Conf == nil {
 		panic("Conf cannot be empty")
 	}
-	token, ok := t.store.Load(t.conf.AppID)
+	token, ok := t.store.Load(t.Conf.AppID)
 	if !ok {
 		token = t.getToken()
 	}
@@ -106,13 +105,13 @@ func (t *Todo) getToken() (token *store.AccessToken) {
 	defer t.mutex.Unlock()
 	apiUrl := "https://api.weixin.qq.com/cgi-bin/token"
 
-	if t.retry > 0 || t.store.IsExpire(t.conf.AppID) {
-		url := apiUrl + "?grant_type=client_credential&AppId=" + t.conf.AppID + "&secret=" + t.conf.AppSecret
+	if t.retry > 0 || t.store.IsExpire(t.Conf.AppID) {
+		url := apiUrl + "?grant_type=client_credential&AppId=" + t.Conf.AppID + "&secret=" + t.Conf.AppSecret
 		get, _ := utils.HttpGet(url)
 		json.Unmarshal(get, &token)
 		token.CreateAt = time.Now().Unix()
 
-		t.store.Store(t.conf.AppID, token)
+		t.store.Store(t.Conf.AppID, token)
 		t.retry = 0
 	}
 	return token

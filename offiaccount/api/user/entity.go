@@ -1,5 +1,12 @@
 package user
 
+type AccessTokenRes struct {
+	AccessToken  string `json:"access_token"`
+	ExpiresIn    int    `json:"expires_in"`
+	RefreshToken string `json:"refresh_token"`
+	Openid       string `json:"openid"`
+	Scope        string `json:"scope"`
+}
 type ListRes struct {
 	Total int `json:"total"`
 	Count int `json:"count"`

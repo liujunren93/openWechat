@@ -24,8 +24,6 @@ func HttpGet(url string) ([]byte, error) {
 	return re, err
 }
 
-
-
 func HttpPost(url string, header http.Header, data []byte) ([]byte, error) {
 
 	url = strings.Trim(url, " ")
@@ -38,7 +36,7 @@ func HttpPost(url string, header http.Header, data []byte) ([]byte, error) {
 	client := http.Client{}
 	do, err := client.Do(request)
 	if err != nil {
-		return nil,err
+		return nil, err
 	}
 	body := do.Body
 	all, err := ioutil.ReadAll(body)

@@ -8,7 +8,6 @@ import (
 	"log"
 	"net/url"
 	"reflect"
-	"strings"
 	"sync"
 	"time"
 )
@@ -19,6 +18,11 @@ type Todo struct {
 	Conf  *Config
 	store store.Store
 }
+
+const (
+	namespaceAccessToken = "openWechatAccessToken"
+	namespaceTicket      = "openWechatJsApiTicket"
+)
 
 func (t *Todo) SetConf(conf *Config) {
 	t.Conf = conf
@@ -41,10 +45,10 @@ func ToDoFuncGet(api string, res interface{}, kv ...string) toDoFunc {
 		}
 		of := reflect.ValueOf(res)
 		elem := of.Elem()
-		switch elem.Kind(){
+		switch elem.Kind() {
 		case reflect.String:
 			s := res.(*string)
-			*s=string(re)
+			*s = string(re)
 		default:
 			err = json.Unmarshal(re, &res)
 		}
@@ -67,8 +71,21 @@ func ToDoFuncPost(api string, res interface{}, data []byte, kv ...string) toDoFu
 	}
 	return func(token string) ([]byte, error) {
 		api = buildApi(api, token, kv)
-		fmt.Println(api)
-		return utils.HttpPost(api, nil, data)
+		re, err := utils.HttpPost(api, nil, data)
+		if err != nil {
+			return re, err
+		}
+		of := reflect.ValueOf(res)
+		elem := of.Elem()
+		switch elem.Kind() {
+		case reflect.String:
+			s := res.(*string)
+			*s = string(re)
+		default:
+			err = json.Unmarshal(re, &res)
+		}
+		return re, nil
+
 	}
 
 }
@@ -78,42 +95,67 @@ func (t *Todo) Do(f toDoFunc) error {
 	if t.Conf == nil {
 		panic("Conf cannot be empty")
 	}
-	token, ok := t.store.Load(t.Conf.AppID)
-	if !ok {
-		token = t.getToken()
-	}
-	bytes, err := f(token.AccessToken)
+	token, err := t.getAccessToken()
 	if err != nil {
 		return err
 	}
-	if strings.Index(string(bytes), "errcode") > 0 {
-		_ = json.Unmarshal(bytes, &errRes)
-		if errRes.ErrorCode == 40001 {
-			if t.retry >= 3 {
-				return errRes
-			}
-			t.retry++
-			return t.Do(f)
-		}
-		return errRes
+	bytes, err := f(token.GetVal())
+	if err != nil {
+		return err
 	}
-	return nil
+	//if strings.Index(string(bytes), "errcode") > 0 {
+	_ = json.Unmarshal(bytes, &errRes)
+	if errRes.ErrorCode == 40001 {
+		if t.retry >= 3 {
+			return errRes
+		}
+		t.retry++
+		return t.Do(f)
+	} else if errRes.ErrorCode == 0 {
+		t.retry = 0
+		return nil
+	}
+	return errRes
 }
 
-func (t *Todo) getToken() (token *store.AccessToken) {
+// 获取accessToken
+func (t *Todo) getAccessToken() (token *store.AccessToken, err error) {
 	t.mutex.Lock()
 	defer t.mutex.Unlock()
 	apiUrl := "https://api.weixin.qq.com/cgi-bin/token"
 
-	if t.retry > 0 || t.store.IsExpire(t.Conf.AppID) {
-		url := apiUrl + "?grant_type=client_credential&AppId=" + t.Conf.AppID + "&secret=" + t.Conf.AppSecret
-		get, _ := utils.HttpGet(url)
-		json.Unmarshal(get, &token)
-		token.CreateAt = time.Now().Unix()
-
-		t.store.Store(t.Conf.AppID, token)
+	if t.retry > 0 || t.store.IsExpire("", t.Conf.AppID) {
+		apiUrl += "?grant_type=client_credential&AppId=" + t.Conf.AppID + "&secret=" + t.Conf.AppSecret
+		get, _ := utils.HttpGet(apiUrl)
+		err = json.Unmarshal(get, &token)
+		if err != nil {
+			return
+		}
+		err = t.store.Store(namespaceAccessToken, t.Conf.AppID, token)
 		t.retry = 0
 	}
-	return token
+	return
 
+}
+
+//
+func (t *Todo) GetTicket() (string, error) {
+	// 判断是否过期
+	if load, ok := t.store.Load(namespaceTicket, t.Conf.AppID); ok {
+		if time.Now().Local().Unix()-load.GetCreateTime() < load.GetExpire()-100 { // 未过期
+			return load.GetVal(), nil
+		}
+	}
+	var res store.JsApiTicket
+	get := ToDoFuncGet("https://api.weixin.qq.com/cgi-bin/ticket/getticket", &res, "type", "jsapi")
+	err := t.Do(get)
+	if err != nil {
+		return "", err
+	}
+	if res.ErrCode != 0 {
+		return "", err
+	}
+	fmt.Println(111)
+	err = t.store.Store(namespaceTicket, t.Conf.AppID, &res)
+	return res.GetVal(), nil
 }

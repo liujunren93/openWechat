@@ -2,6 +2,7 @@ package offiAccount
 
 import (
 	"github.com/liujunren93/openWechat/offiaccount/api/menu"
+	"github.com/liujunren93/openWechat/offiaccount/api/signature"
 	"github.com/liujunren93/openWechat/offiaccount/api/user"
 	"github.com/liujunren93/openWechat/offiaccount/internal"
 	"github.com/liujunren93/openWechat/store"
@@ -39,3 +40,9 @@ func (o *OffiAccount) MenuApi() *menu.Api {
 	}
 }
 
+func (o *OffiAccount) Signature() *signature.Api {
+	return &signature.Api{
+		Todo: o.toDo,
+	}
+
+}

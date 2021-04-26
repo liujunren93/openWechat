@@ -13,7 +13,7 @@ import (
 type store struct {
 	fileName string
 	sync.RWMutex
-	storeMap map[string]*iStore.AccessToken
+	storeMap map[string]iStore.Data
 }
 
 func NewStore(fileName string) *store {
@@ -25,13 +25,13 @@ func NewStore(fileName string) *store {
 			panic(err)
 		}
 	}
-	return &store{fileName: fileName, storeMap: map[string]*iStore.AccessToken{}}
+	return &store{fileName: fileName, storeMap: map[string]iStore.Data{}}
 }
 
-func (s *store) Load(appId string) (res *iStore.AccessToken, ok bool) {
+func (s *store) Load(appId string) (res iStore.Data, ok bool) {
 	if token, ok := s.storeMap[appId]; ok {
 
-		if time.Now().Unix()-token.CreateAt >= 7100 {
+		if time.Now().Unix()-token.GetCreateTime() >= 7100 {
 			return nil, false
 		}
 		return token, true
@@ -41,7 +41,7 @@ func (s *store) Load(appId string) (res *iStore.AccessToken, ok bool) {
 		if err != nil {
 			return nil, false
 		}
-		var data map[string]*iStore.AccessToken
+		var data map[string]iStore.Data
 		all, err := ioutil.ReadAll(open)
 		err = json.Unmarshal(all, &data)
 		if err != nil {
@@ -51,7 +51,7 @@ func (s *store) Load(appId string) (res *iStore.AccessToken, ok bool) {
 		s.storeMap = data
 		s.Unlock()
 		if token, ok := data[appId]; ok {
-			if time.Now().Unix()-token.CreateAt >= 7100 {
+			if time.Now().Unix()-token.GetCreateTime() >= 7100 {
 				return nil, false
 			}
 			return token, true
@@ -64,7 +64,7 @@ func (s *store) Load(appId string) (res *iStore.AccessToken, ok bool) {
 func (s *store) IsExpire(appId string) bool {
 
 	if load, ok := s.Load(appId); ok {
-		if time.Now().Unix()-load.CreateAt >= 7100 {
+		if time.Now().Unix()-load.GetCreateTime() >= 7100 {
 			return true
 		}
 		return false
@@ -73,7 +73,7 @@ func (s *store) IsExpire(appId string) bool {
 
 }
 
-func (s *store) Store(appId string, accessToken *iStore.AccessToken) {
+func (s *store) Store(appId string, accessToken iStore.Data) {
 	s.Lock()
 	defer s.Unlock()
 	s.storeMap[appId] = accessToken

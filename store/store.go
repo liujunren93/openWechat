@@ -4,7 +4,7 @@ type Store interface {
 	Load(namespace, appId string) (Data, bool)
 	IsExpire(namespace, appId string) bool
 	//Store(appId string, accessToken *AccessToken)
-	Store(namespace, appId string, val Data) error
+	Store(namespace, appId string, val Data)error
 }
 
 type Data interface {

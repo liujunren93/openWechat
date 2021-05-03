@@ -75,15 +75,18 @@ func ToDoFuncPost(api string, res interface{}, data []byte, kv ...string) toDoFu
 		if err != nil {
 			return re, err
 		}
-		of := reflect.ValueOf(res)
-		elem := of.Elem()
-		switch elem.Kind() {
-		case reflect.String:
-			s := res.(*string)
-			*s = string(re)
-		default:
-			err = json.Unmarshal(re, &res)
+		if res!=nil {
+			of := reflect.ValueOf(res)
+			elem := of.Elem()
+			switch elem.Kind() {
+			case reflect.String:
+				s := res.(*string)
+				*s = string(re)
+			default:
+				err = json.Unmarshal(re, &res)
+			}
 		}
+
 		return re, nil
 
 	}
@@ -123,14 +126,19 @@ func (t *Todo) getAccessToken() (token *store.AccessToken, err error) {
 	t.mutex.Lock()
 	defer t.mutex.Unlock()
 	apiUrl := "https://api.weixin.qq.com/cgi-bin/token"
-
-	if t.retry > 0 || t.store.IsExpire("", t.Conf.AppID) {
+	if val, ok := t.store.Load(namespaceAccessToken, t.Conf.AppID);ok{
+		if time.Now().Local().Unix()-val.GetCreateTime() < val.GetExpire()-100 { // 未过期
+			return val.(*store.AccessToken), nil
+		}
+	}
+	if t.retry > 0 || t.store.IsExpire(namespaceAccessToken, t.Conf.AppID) {
 		apiUrl += "?grant_type=client_credential&AppId=" + t.Conf.AppID + "&secret=" + t.Conf.AppSecret
 		get, _ := utils.HttpGet(apiUrl)
 		err = json.Unmarshal(get, &token)
 		if err != nil {
 			return
 		}
+		token.SetCreatedTime(time.Now().Local().Unix())
 		err = t.store.Store(namespaceAccessToken, t.Conf.AppID, token)
 		t.retry = 0
 	}

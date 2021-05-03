@@ -2,7 +2,7 @@ package store
 
 // token 系统accessToken
 type AccessToken struct {
-	AccessToken string `json:"access_token"`
+	Val string `json:"access_token"`
 	ExpiresIn   int64  `json:"expires_in"`
 	CreateAt    int64
 }
@@ -12,7 +12,7 @@ func (a *AccessToken) SetCreatedTime(i int64) {
 }
 
 func (a *AccessToken) SetVal(s string) {
-	a.AccessToken = s
+	a.Val = s
 }
 
 func (a *AccessToken) GetCreateTime() int64 {
@@ -24,5 +24,5 @@ func (a *AccessToken) GetExpire() int64 {
 }
 
 func (a *AccessToken) GetVal() string {
-	return a.AccessToken
+	return a.Val
 }

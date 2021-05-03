@@ -3,6 +3,7 @@ package offiAccount
 import (
 	"fmt"
 	"github.com/liujunren93/openWechat/offiaccount/api/menu"
+	"github.com/liujunren93/openWechat/store/file"
 	"testing"
 	"time"
 )
@@ -36,11 +37,11 @@ func TestA(t *testing.T)  {
 
 func TestSetMenu(t *testing.T)  {
 	newMenu :=menu.NewMenu()
-	//store := file.NewStore("/Library/WebServer/Documents/gowork/src/openWechat/offiaccount/tt.json")
+	store := file.NewStore("/Library/WebServer/Documents/gowork/src/openWechat/offiaccount/tt.json")
 	newMenu.AddClickBtn("btn1","btn1").AddClickBtn("btn1-1","btn1-1")
 	newMenu.AddClickBtn("btn2","btn2").AddViewBtn("btn1-1","btn1-1","http://baidu.com","","")
 	newMenu.AddClickBtn("btn3","btn3").AddLocationSelectBtn("local","local").AddPicWeixinBtn("wxPic","wp")
-	account := NewOfficialAccount("wx40a5b2247d31bddf", "5d4677b6498b90282585c573ac324a7a", nil)
+	account := NewOfficialAccount("wx40a5b2247d31bddf", "5d4677b6498b90282585c573ac324a7a", store)
 
 	err := account.MenuApi().Create(newMenu)
 	fmt.Println(err)

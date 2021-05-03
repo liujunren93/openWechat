@@ -11,19 +11,21 @@ type store struct {
 	storeMap sync.Map
 }
 
+
 func NewStore() *store {
 	return &store{}
 }
 
-func (s *store) Load(namespace, appId string) (iStore.Data, bool) {
+func (s *store) Load(namespace, appId string) (data iStore.Data, isExpire bool) {
 	if load, ok := s.storeMap.Load(s.buildKey(namespace, appId)); ok {
-		data := load.(iStore.Data)
+		data = load.(iStore.Data)
+
 		return data, true
 	}
 	return nil, false
 }
 
-func (s *store) Store(namespace, appId string, data iStore.Data) error {
+func (s *store) Store(namespace,appId string, data iStore.Data) error {
 	data.SetCreatedTime(time.Now().Local().Unix())
 	s.storeMap.Store(s.buildKey(namespace, appId), data)
 	return nil

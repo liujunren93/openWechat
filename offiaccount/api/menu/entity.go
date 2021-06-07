@@ -165,3 +165,43 @@ func (m *menu) AddViewLimitedBtn(name, key string) *menu {
 	})
 	return m
 }
+
+type ResMenu struct {
+	IsMenuOpen   int8 `json:"is_menu_open"`
+	SelfMenuInfo struct {
+		Button []ResButton
+	} `json:"selfmenu_info"`
+}
+
+type ResButton struct {
+	Name      string `json:"name,omitempty"`
+	Type      Type   `json:"type,omitempty"` //click
+	Value     string `json:"value,omitempty"`
+	Key       string `json:"key,omitempty"`
+	AppID     string `json:"appid,omitempty"`
+	PagePath  string `json:"pagepath,omitempty"`
+	Url       string `json:"url,omitempty"`
+	MediaID   string `json:"media_id,omitempty"`
+	SubButton struct {
+		List *menu `json:"list"`
+	} `json:"sub_button"`
+}
+
+func (m *ResMenu) ToMenu() *menu {
+	var mu menu
+	for _, button := range m.SelfMenuInfo.Button {
+		tmpBtn := Button{
+			Name:      button.Name,
+			Type:      button.Type,
+			Value:     button.Value,
+			Key:       button.Key,
+			AppID:     button.AppID,
+			PagePath:  button.PagePath,
+			Url:       button.Url,
+			MediaID:   button.MediaID,
+			SubButton: button.SubButton.List,
+		}
+		mu = append(mu, &tmpBtn)
+	}
+	return &mu
+}

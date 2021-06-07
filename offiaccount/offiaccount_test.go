@@ -102,7 +102,6 @@ func TestSetMenu1(t *testing.T)  {
 }
 
 func TestGetMenu(t *testing.T)  {
-	//store := file.NewStore("/Library/WebServer/Documents/gowork/src/openWechat/offiaccount/tt.json")
 	account := NewOfficialAccount("wxc0f32e9fab6d06c9", "15ca38c49b2dfbcf1d1d9f4fc22efa2d", nil)
 	list ,_:= account.MenuApi().List()
 	err := account.MenuApi().Create(list.ToMenu())

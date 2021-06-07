@@ -166,7 +166,7 @@ func (m *menu) AddViewLimitedBtn(name, key string) *menu {
 	return m
 }
 
-type ResMenu struct {
+type resMenu struct {
 	IsMenuOpen   int8 `json:"is_menu_open"`
 	SelfMenuInfo struct {
 		Button []ResButton
@@ -187,7 +187,7 @@ type ResButton struct {
 	} `json:"sub_button"`
 }
 
-func (m *ResMenu) ToMenu() *menu {
+func (m *resMenu) ToMenu() *menu {
 	var mu menu
 	for _, button := range m.SelfMenuInfo.Button {
 		tmpBtn := Button{

@@ -9,8 +9,8 @@ type Api struct {
 	*internal.Todo
 }
 
-func (a *Api) List() (*ResMenu, error) {
-	var res ResMenu
+func (a *Api) List() (*resMenu, error) {
+	var res resMenu
 	api := "https://api.weixin.qq.com/cgi-bin/get_current_selfmenu_info"
 	f := internal.ToDoFuncGet(api, &res)
 

@@ -2,7 +2,7 @@ package internal
 
 import (
 	"encoding/json"
-	"fmt"
+	"github.com/liujunren93/openWechat/offiaccount/consts"
 	"github.com/liujunren93/openWechat/store"
 	"github.com/liujunren93/openWechat/utils"
 	"log"
@@ -64,6 +64,33 @@ func buildApi(api string, token string, kv []string) string {
 	}
 	return api + "?" + val.Encode()
 }
+func ToDoFuncPostForm(api string, res interface{}, file utils.File, data map[string]string, kv ...string) toDoFunc {
+	if len(kv)%2 != 0 {
+		log.Panic("KV has to be even ")
+	}
+	return func(token string) ([]byte, error) {
+		api = buildApi(api, token, kv)
+		re, err := utils.HttpPostForm(api, nil, data, file)
+		if err != nil {
+			return re, err
+		}
+		if res != nil {
+			of := reflect.ValueOf(res)
+			elem := of.Elem()
+			switch elem.Kind() {
+			case reflect.String:
+				s := res.(*string)
+				*s = string(re)
+			default:
+				err = json.Unmarshal(re, &res)
+			}
+		}
+
+		return re, nil
+
+	}
+
+}
 
 func ToDoFuncPost(api string, res interface{}, data []byte, kv ...string) toDoFunc {
 	if len(kv)%2 != 0 {
@@ -75,7 +102,7 @@ func ToDoFuncPost(api string, res interface{}, data []byte, kv ...string) toDoFu
 		if err != nil {
 			return re, err
 		}
-		if res!=nil {
+		if res != nil {
 			of := reflect.ValueOf(res)
 			elem := of.Elem()
 			switch elem.Kind() {
@@ -94,7 +121,7 @@ func ToDoFuncPost(api string, res interface{}, data []byte, kv ...string) toDoFu
 }
 
 func (t *Todo) Do(f toDoFunc) error {
-	var errRes *ErrorRes
+	var errRes *consts.ErrorRes
 	if t.Conf == nil {
 		panic("Conf cannot be empty")
 	}
@@ -126,7 +153,7 @@ func (t *Todo) getAccessToken() (token *store.AccessToken, err error) {
 	t.mutex.Lock()
 	defer t.mutex.Unlock()
 	apiUrl := "https://api.weixin.qq.com/cgi-bin/token"
-	if val, ok := t.store.Load(namespaceAccessToken, t.Conf.AppID);ok{
+	if val, ok := t.store.Load(namespaceAccessToken, t.Conf.AppID); ok {
 		if time.Now().Local().Unix()-val.GetCreateTime() < val.GetExpire()-100 { // 未过期
 			return val.(*store.AccessToken), nil
 		}
@@ -163,7 +190,6 @@ func (t *Todo) GetTicket() (string, error) {
 	if res.ErrCode != 0 {
 		return "", err
 	}
-	fmt.Println(111)
 	err = t.store.Store(namespaceTicket, t.Conf.AppID, &res)
 	return res.GetVal(), nil
 }

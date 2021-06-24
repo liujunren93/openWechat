@@ -76,7 +76,6 @@ type BatchMaterialRes struct {
 }
 
 type MaterialItem struct {
-
 	MediaID    string `json:"media_id,omitempty"`
 	Name       string `json:"name,omitempty"`
 	Url        string `json:"url,omitempty"`
@@ -84,4 +83,11 @@ type MaterialItem struct {
 	Content    struct {
 		NewsItem []News `json:"news_item"`
 	} `json:"content,omitempty"`
+}
+
+type MaterialsInfoRes struct {
+	Title       string `json:"title,omitempty"`
+	Description string `json:"description,omitempty"`
+	DownUrl     string `json:"down_url,omitempty"`
+	NewsItem    []News `json:"news_item,omitempty"`
 }

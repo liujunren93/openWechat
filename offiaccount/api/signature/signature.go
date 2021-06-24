@@ -9,7 +9,11 @@ import (
 )
 
 type Api struct {
-	*internal.Todo
+	todo *internal.Todo
+}
+
+func NewApi(todo *internal.Todo) *Api {
+	return &Api{todo: todo}
 }
 
 type signature struct {
@@ -25,7 +29,7 @@ func (a *Api) Signature(uri string) (signature,error) {
 		Url:       uri,
 		Noncestr: utils.RandString(10),
 	}
-	ticket, err := a.GetTicket()
+	ticket, err := a.todo.GetTicket()
 	if err != nil {
 		return sign,err
 	}
@@ -33,13 +37,7 @@ func (a *Api) Signature(uri string) (signature,error) {
 
 	uri = urlSlice[0]
 	bufString := fmt.Sprintf("jsapi_ticket=%s&noncestr=%s&timestamp=%d&url=%s", ticket, sign.Noncestr, sign.Timestamp, uri)
-	//urlVal:=url.Values{}
-	//urlVal.Add("jsapi_ticket",ticket)
-	//urlVal.Add("noncestr",sign.Noncestr)
-	//urlVal.Add("timestamp",strconv.FormatInt(sign.Timestamp,10))
-	//urlVal.Add("url",uri)
-	//fmt.Println(urlVal.Encode())
-	//fmt.Println(bufString)
+
 	sign.Signature = utils.Sha1(bufString)
 	return sign,nil
 }

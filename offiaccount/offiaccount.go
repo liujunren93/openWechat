@@ -30,27 +30,19 @@ func NewOfficialAccount(appId, AppSecret string, s store.Store) *Client {
 
 //UserApi 用户相关
 func (o *Client) UserApi() *user.Api {
-	return &user.Api{
-		Todo: o.toDo,
-	}
+	return user.NewApi(o.toDo)
 }
 
 func (o *Client) MenuApi() *menu.Api {
-	return &menu.Api{
-		Todo: o.toDo,
-	}
+	return menu.NewApi(o.toDo)
 }
 
 //MaterialApi 素材
 func (o *Client) MaterialApi() *material.Api {
-	return &material.Api{
-		Todo: o.toDo,
-	}
+	return material.NewApi(o.toDo)
 }
 
 func (o *Client) Signature() *signature.Api {
-	return &signature.Api{
-		Todo: o.toDo,
-	}
+	return signature.NewApi(o.toDo)
 
 }

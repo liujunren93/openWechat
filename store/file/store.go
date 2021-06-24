@@ -1,6 +1,7 @@
 package file
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -18,10 +19,11 @@ type store struct {
 }
 
 func (s *store) Load(namespace, appId string) (iStore.Data, bool) {
-	if token, ok := s.storeMap[s.buildKey(namespace,appId)]; ok {
-		if time.Now().Unix()-token.GetCreateTime() >= 7100 {
-			return nil, false
-		}
+begin:
+	s.RWMutex.RLock()
+	token, ok := s.storeMap[s.buildKey(namespace, appId)]
+	s.RWMutex.RUnlock()
+	if ok {
 		return token, true
 	} else {
 		open, err := os.Open(s.fileName)
@@ -29,28 +31,47 @@ func (s *store) Load(namespace, appId string) (iStore.Data, bool) {
 		if err != nil {
 			return nil, false
 		}
-		var data map[string]iStore.Data
+		var data map[string]map[string]interface{}
 		all, err := ioutil.ReadAll(open)
+		if err != nil || len(all)==0{
+			return nil, false
+		}
+		all = bytes.Trim(all, " ")
 		err = json.Unmarshal(all, &data)
 		if err != nil {
 			return nil, false
 		}
 		s.Lock()
-		s.storeMap = data
-		s.Unlock()
-		if token, ok := data[s.buildKey(namespace,appId)]; ok {
-			if time.Now().Unix()-token.GetCreateTime() >= 7100 {
-				return nil, false
+		for k, m := range data {
+			var tmp iStore.Data
+			switch m["type"] {
+			case "AccessToken":
+				tmp = &iStore.AccessToken{
+					Val:       m["access_token"].(string),
+					ExpiresIn: int64(m["expires_in"].(float64)),
+					CreateAt:  int64(m["create_at"].(float64)),
+					Type:      "AccessToken",
+				}
+			case "JsApiTicket":
+				tmp = &iStore.JsApiTicket{
+					Val:       m["ticket"].(string),
+					ExpiresIn: int64(m["expires_in"].(float64)),
+					CreateAt:  int64(m["create_at"].(float64)),
+					Type:      "JsApiTicket",
+				}
+
 			}
-			return token, true
+			s.storeMap[k] = tmp
 		}
-		return nil, false
+		s.Unlock()
+		goto begin
+
 	}
 }
 
 func (s *store) IsExpire(namespace, appId string) bool {
-	if load, ok := s.Load(namespace,appId); ok {
-		if time.Now().Unix()-load.GetCreateTime() >= 7100 {
+	if load, ok := s.Load(namespace, appId); ok {
+		if time.Now().Local().Unix()-load.GetCreateTime() >= load.GetExpire()-100 {
 			return true
 		}
 		return false
@@ -61,7 +82,7 @@ func (s *store) IsExpire(namespace, appId string) bool {
 func (s *store) Store(namespace, appId string, val iStore.Data) error {
 	s.Lock()
 	defer s.Unlock()
-	s.storeMap[s.buildKey(namespace,appId)] = val
+	s.storeMap[s.buildKey(namespace, appId)] = val
 	marshal, err := json.Marshal(&s.storeMap)
 	file, err := os.OpenFile(s.fileName, os.O_RDWR, 0666)
 	defer file.Close()

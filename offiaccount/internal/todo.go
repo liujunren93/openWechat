@@ -109,6 +109,7 @@ func ToDoFuncPost(api string, res interface{}, data []byte, kv ...string) toDoFu
 			case reflect.String:
 				s := res.(*string)
 				*s = string(re)
+
 			default:
 				err = json.Unmarshal(re, &res)
 			}
@@ -125,6 +126,8 @@ func (t *Todo) Do(f toDoFunc) error {
 	if t.Conf == nil {
 		panic("Conf cannot be empty")
 	}
+
+retry:
 	token, err := t.getAccessToken()
 	if err != nil {
 		return err
@@ -140,7 +143,8 @@ func (t *Todo) Do(f toDoFunc) error {
 			return errRes
 		}
 		t.retry++
-		return t.Do(f)
+
+		goto retry
 	} else if errRes.ErrorCode == 0 {
 		t.retry = 0
 		return nil
@@ -153,11 +157,6 @@ func (t *Todo) getAccessToken() (token *store.AccessToken, err error) {
 	t.mutex.Lock()
 	defer t.mutex.Unlock()
 	apiUrl := "https://api.weixin.qq.com/cgi-bin/token"
-	if val, ok := t.store.Load(namespaceAccessToken, t.Conf.AppID); ok {
-		if time.Now().Local().Unix()-val.GetCreateTime() < val.GetExpire()-100 { // 未过期
-			return val.(*store.AccessToken), nil
-		}
-	}
 	if t.retry > 0 || t.store.IsExpire(namespaceAccessToken, t.Conf.AppID) {
 		apiUrl += "?grant_type=client_credential&AppId=" + t.Conf.AppID + "&secret=" + t.Conf.AppSecret
 		get, _ := utils.HttpGet(apiUrl)
@@ -166,9 +165,17 @@ func (t *Todo) getAccessToken() (token *store.AccessToken, err error) {
 			return
 		}
 		token.SetCreatedTime(time.Now().Local().Unix())
+		token.Type = "AccessToken"
 		err = t.store.Store(namespaceAccessToken, t.Conf.AppID, token)
 		t.retry = 0
+	} else {
+		if val, ok := t.store.Load(namespaceAccessToken, t.Conf.AppID); ok && t.retry == 0 {
+			if time.Now().Local().Unix()-val.GetCreateTime() < val.GetExpire()-100 { // 未过期
+				return val.(*store.AccessToken), nil
+			}
+		}
 	}
+
 	return
 
 }
@@ -182,6 +189,7 @@ func (t *Todo) GetTicket() (string, error) {
 		}
 	}
 	var res store.JsApiTicket
+	res.Type = "JsApiTicket"
 	get := ToDoFuncGet("https://api.weixin.qq.com/cgi-bin/ticket/getticket", &res, "type", "jsapi")
 	err := t.Do(get)
 	if err != nil {

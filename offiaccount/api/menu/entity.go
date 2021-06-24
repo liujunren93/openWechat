@@ -24,24 +24,24 @@ type Button struct {
 	PagePath  string `json:"pagepath,omitempty"`
 	Url       string `json:"url,omitempty"`
 	MediaID   string `json:"media_id,omitempty"`
-	SubButton *menu  `json:"sub_button,omitempty"`
+	SubButton *Menu  `json:"sub_button,omitempty"`
 }
 
-type menu []*Button
+type Menu []*Button
 
 type ReceiveMenu struct {
 	IsMenuOpen   int              `json:"is_menu_open"`
-	SelfmenuInfo map[string]*menu `json:"selfmenu_info"`
+	SelfMenuInfo map[string]*Menu `json:"selfmenu_info"`
 }
 
-func NewMenu() *menu {
-	return new(menu)
+func NewMenu() *Menu{
+	return new(Menu)
 }
 
-type MenuFunc func(*[]*Button) *menu
+type MenuFunc func(*[]*Button) *Menu
 
 //WithClickBtn 点击推事件用户点击click类型按钮
-func (m *menu) AddClickBtn(name, key string) *menu {
+func (m *Menu) AddClickBtn(name, key string) *Menu{
 	subButton := NewMenu()
 	*m = append(*m, &Button{
 		Name:      name,
@@ -52,7 +52,7 @@ func (m *menu) AddClickBtn(name, key string) *menu {
 	return subButton
 }
 
-func (m *menu) AddViewBtn(name, key, url, appId, pagePath string) *menu {
+func (m *Menu) AddViewBtn(name, key, url, appId, pagePath string) *Menu{
 	*m = append(*m, &Button{
 		Name:     name,
 		Type:     VIEW,
@@ -65,7 +65,7 @@ func (m *menu) AddViewBtn(name, key, url, appId, pagePath string) *menu {
 }
 
 //AddScancodeWaitMsgBtn 扫码带提示
-func (m *menu) AddScancodeWaitMsgBtn(name, key, url, appid, pagepath string) *menu {
+func (m *Menu) AddScancodeWaitMsgBtn(name, key, url, appid, pagepath string) *Menu{
 	subButton := NewMenu()
 	*m = append(*m, &Button{
 		Url:       url,
@@ -81,7 +81,7 @@ func (m *menu) AddScancodeWaitMsgBtn(name, key, url, appid, pagepath string) *me
 }
 
 //AddScancodePushBtn 扫码推事件
-func (m *menu) AddScancodePushBtn(name, key string) *menu {
+func (m *Menu) AddScancodePushBtn(name, key string) *Menu{
 	subButton := NewMenu()
 
 	*m = append(*m, &Button{
@@ -95,7 +95,7 @@ func (m *menu) AddScancodePushBtn(name, key string) *menu {
 }
 
 //AddPicSysPhotoBtn 系统拍照发图
-func (m *menu) AddPicSysPhotoBtn(name, key string) *menu {
+func (m *Menu) AddPicSysPhotoBtn(name, key string) *Menu{
 
 	subButton := NewMenu()
 	*m = append(*m, &Button{
@@ -109,7 +109,7 @@ func (m *menu) AddPicSysPhotoBtn(name, key string) *menu {
 }
 
 //AddPicPhotoOrAlbumBtn 拍照或者相册发图
-func (m *menu) AddPicPhotoOrAlbumBtn(name, key string) *menu {
+func (m *Menu) AddPicPhotoOrAlbumBtn(name, key string) *Menu{
 
 	subButton := NewMenu()
 	*m = append(*m, &Button{
@@ -123,7 +123,7 @@ func (m *menu) AddPicPhotoOrAlbumBtn(name, key string) *menu {
 }
 
 //AddPicWeixinBtn 微信相册发图
-func (m *menu) AddPicWeixinBtn(name, key string) *menu {
+func (m *Menu) AddPicWeixinBtn(name, key string) *Menu{
 
 	subButton := NewMenu()
 	*m = append(*m, &Button{
@@ -137,7 +137,7 @@ func (m *menu) AddPicWeixinBtn(name, key string) *menu {
 }
 
 //AddLocationSelectBtn 发送位置
-func (m *menu) AddLocationSelectBtn(name, key string) *menu {
+func (m *Menu) AddLocationSelectBtn(name, key string) *Menu{
 	*m = append(*m, &Button{
 		Name: name,
 		Type: LOCATION_SELECT,
@@ -147,7 +147,7 @@ func (m *menu) AddLocationSelectBtn(name, key string) *menu {
 
 }
 
-func (m *menu) AddMediaBtn(name, key string) *menu {
+func (m *Menu) AddMediaBtn(name, key string) *Menu{
 	*m = append(*m, &Button{
 		Type: MEDIA_ID,
 		Name: name,
@@ -157,7 +157,7 @@ func (m *menu) AddMediaBtn(name, key string) *menu {
 }
 
 //AddViewLimitedBtn 图文消息
-func (m *menu) AddViewLimitedBtn(name, key string) *menu {
+func (m *Menu) AddViewLimitedBtn(name, key string) *Menu{
 	*m = append(*m, &Button{
 		Type: VIEW_LIMITED,
 		Name: name,
@@ -183,12 +183,12 @@ type ResButton struct {
 	Url       string `json:"url,omitempty"`
 	MediaID   string `json:"media_id,omitempty"`
 	SubButton struct {
-		List *menu `json:"list"`
+		List *Menu`json:"list"`
 	} `json:"sub_button"`
 }
 
-func (m *resMenu) ToMenu() *menu {
-	var mu menu
+func (m *resMenu) ToMenu() *Menu{
+	var mu Menu
 	for _, button := range m.SelfMenuInfo.Button {
 		tmpBtn := Button{
 			Name:      button.Name,

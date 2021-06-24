@@ -16,8 +16,8 @@ var client *Client
 
 func init() {
 	store := file.NewStore("/Library/WebServer/Documents/gowork/src/openWechat/offiaccount/tt")
-	//client = NewOfficialAccount("wx40a5b2247d31bddf", "5d4677b6498b90282585c573ac324a7a", store)
-	client = NewOfficialAccount("wxc0f32e9fab6d06c9", "15ca38c49b2dfbcf1d1d9f4fc22efa2d", store)
+	client = NewOfficialAccount("wx40a5b2247d31bddf", "5d4677b6498b90282585c573ac324a7a", store)
+	//client = NewOfficialAccount("wxc0f32e9fab6d06c9", "15ca38c49b2dfbcf1d1d9f4fc22efa2d", store)
 
 }
 
@@ -45,8 +45,8 @@ func TestA(t *testing.T) {
 func TestSetMenu(t *testing.T) {
 	newMenu := menu.NewMenu()
 	newMenu.AddClickBtn("btn1", "btn1").AddScancodePushBtn("scan", "scan")
-	//newMenu.AddClickBtn("btn2","btn2").AddViewBtn("btn1-1","btn1-1","http://baidu.com","","")
-	//newMenu.AddClickBtn("btn3","btn3").AddLocationSelectBtn("local","local").AddPicWeixinBtn("wxPic","wp")
+	newMenu.AddClickBtn("btn2","btn2").AddViewBtn("btn1-1","btn1-1","http://baidu.com","","")
+	newMenu.AddClickBtn("btn3","btn3").AddLocationSelectBtn("local","local").AddPicWeixinBtn("wxPic","wp")
 	err := client.MenuApi().Create(newMenu)
 	fmt.Println(err)
 }
@@ -103,8 +103,8 @@ func TestSetMenu1(t *testing.T) {
 
 func TestGetMenu(t *testing.T) {
 	list, _ := client.MenuApi().List()
-	err := client.MenuApi().Create(list.ToMenu())
-	fmt.Println(err)
+	//err := client.MenuApi().Create(list.ToMenu())
+	fmt.Println(list)
 }
 
 func TestOffiAccount_Signature(t *testing.T) {
@@ -116,7 +116,7 @@ func TestOffiAccount_Signature(t *testing.T) {
 }
 
 func TestOffiAccount_MaterialApi_UpTemporary(t *testing.T) {
-	readFile, err := os.Open("./timg.jpeg")
+	readFile, err := os.Open("./tt.jpeg")
 	fmt.Println(err)
 
 	res, err := client.MaterialApi().AddTemporary(material.NewImage(readFile, ""))
@@ -137,19 +137,29 @@ func TestOffiAccount_MaterialApi_UploadImg(t *testing.T) {
 
 func TestOffiAccount_Material(t *testing.T) {
 
-	img, err := client.MaterialApi().BatchGetMaterial("video", 0, 10)
+	img, err := client.MaterialApi().BatchGetMaterial("", 0, 10)
 	fmt.Println(img, err)
 }
 func TestOffiAccount_addMaterial(t *testing.T) {
-	open, _ := os.Open("./tt.jpeg")
-	img, err := client.MaterialApi().AddMaterial(material.NewImage(open, ""),
+	open, _ := os.Open("./tt.mp4")
+	img, err := client.MaterialApi().AddMaterial(material.NewVideo(open, ""),
 		map[string]string{"description": `{"title":"VIDEO_TITLE", "introduction":"INTRODUCTION"}`})
 	fmt.Println(img, err)
 }
 func TestOffiAccount_MaterialApi_AddNews(t *testing.T) {
 	news, err := client.MaterialApi().AddNews(material.News{
-		Title:              "test",
-		ThumbMediaID:       "cmy4CTVC2HUAA75tQFl9neng-VmHJzdTANsCRUPK1Ys",
+		Title:              "ttt",
+		ThumbMediaID:       "Ylfx1KKkztYhcz0ZQzhogZ7oZ-nyaci-h2krZYPUPy0",
+		ShowCoverPic:       true,
+		Author:             "liujunren",
+		Digest:             "",
+		Content:            "test http://mmbiz.qpic.cn/mmbiz_jpg/dnNCVVyy7W0j0DU0CDefQRW8ulCq2ib8UnRJMfCKMUWt9Ng9xWmHfjPaeLQyPaQVReOm1Kop7bOMP5Ifhib0ylhA/0?wx_fmt=jpeg",
+		ContentSourceUrl:   "https://baidu.com",
+		NeedOpenComment:    true,
+		OnlyFansCanComment: true,
+	},material.News{
+		Title:              "ttt1",
+		ThumbMediaID:       "Ylfx1KKkztYhcz0ZQzhogZ7oZ-nyaci-h2krZYPUPy0",
 		ShowCoverPic:       true,
 		Author:             "liujunren",
 		Digest:             "",
@@ -160,4 +170,10 @@ func TestOffiAccount_MaterialApi_AddNews(t *testing.T) {
 	})
 	fmt.Println(news, err)
 
+}
+
+//Ylfx1KKkztYhcz0ZQzhogei04pT46O1ZoxO1LhbcBjI
+func TestOffiAccount_MaterialApiInfo(t *testing.T) {
+	info, err := client.MaterialApi().MaterialInfo("cmy4CTVC2HUAA75tQFl9nc7BnInGdggOYH1nH-LBcwg")
+fmt.Println(info, err )
 }

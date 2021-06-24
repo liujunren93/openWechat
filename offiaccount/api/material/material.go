@@ -8,7 +8,11 @@ import (
 )
 
 type Api struct {
-	*internal.Todo
+	todo *internal.Todo
+}
+
+func NewApi(todo *internal.Todo) *Api {
+	return &Api{todo: todo}
 }
 
 // 新增临时素材
@@ -16,7 +20,7 @@ func (a *Api) AddTemporary(media media) (AddTemporaryRes, error) {
 	var res AddTemporaryRes
 	api := "https://api.weixin.qq.com/cgi-bin/media/upload"
 	f := internal.ToDoFuncPostForm(api, &res, media, nil, "type", media._type)
-	err := a.Do(f)
+	err := a.todo.Do(f)
 	return res, err
 }
 
@@ -34,7 +38,7 @@ func (a *Api) AddNews(news ...News) (string, error) {
 	buf.Write(marshal)
 	buf.WriteString("}")
 	f := internal.ToDoFuncPost(api, &res, buf.Bytes())
-	err = a.Do(f)
+	err = a.todo.Do(f)
 	return res.MediaID, err
 }
 
@@ -43,27 +47,36 @@ func (a *Api) UploadImg(file *os.File) (string, error) {
 	api := "https://api.weixin.qq.com/cgi-bin/media/uploadimg"
 
 	f := internal.ToDoFuncPostForm(api, &res, NewImage(file, file.Name()), nil)
-	err := a.Do(f)
+	err := a.todo.Do(f)
 	return res.Url, err
 }
 
-func (a *Api) AddMaterial(media media,videDesc map[string]string) (AddMaterialRes, error) {
+func (a *Api) AddMaterial(media media, videDesc map[string]string) (AddMaterialRes, error) {
 	var res AddMaterialRes
-	api:="https://api.weixin.qq.com/cgi-bin/material/add_material"
+	api := "https://api.weixin.qq.com/cgi-bin/material/add_material"
 	f := internal.ToDoFuncPostForm(api, &res, media, videDesc, "type", media._type)
-	err := a.Do(f)
+	err := a.todo.Do(f)
 	return res, err
 }
+
+func (a *Api) MaterialInfo(id string) (MaterialsInfoRes, error) {
+	var res MaterialsInfoRes
+	api := "https://api.weixin.qq.com/cgi-bin/material/get_material"
+	f := internal.ToDoFuncPost(api, &res, []byte(`{"media_id":`+id+`}`))
+	err := a.todo.Do(f)
+	return res, err
+}
+
 //BatchGetMaterial 批量获取素材
 //@param mType 图片（image）、视频（video）、语音 （voice）、图文（news）
 //@param offset
 //@param count
-func (a *Api) BatchGetMaterial(mType string, offset, count int) (interface{}, error) {
+func (a *Api) BatchGetMaterial(mType string, offset, count int) (BatchMaterialRes, error) {
 	var res BatchMaterialRes
 	api := "https://api.weixin.qq.com/cgi-bin/material/batchget_material"
 	var req = map[string]interface{}{"type": mType, "offset": offset, "count": count}
 	marshal, _ := json.Marshal(req)
 	f := internal.ToDoFuncPost(api, &res, marshal)
-	err := a.Do(f)
+	err := a.todo.Do(f)
 	return res, err
 }

@@ -9,16 +9,19 @@ import (
 )
 
 type Api struct {
-	*internal.Todo
+	todo *internal.Todo
 }
 
+func NewApi(todo *internal.Todo) *Api {
+	return &Api{todo: todo}
+}
 
 //GetAccessToken 获取token
 func (a *Api) GetAccessToken(code string) (res *AccessTokenRes, err error) {
 	api := "https://api.weixin.qq.com/sns/oauth2/access_token?%s"
 	apiQuery := url.Values{}
-	apiQuery.Set("appid", a.Conf.AppID)
-	apiQuery.Set("secret",  a.Conf.AppSecret)
+	apiQuery.Set("appid", a.todo.Conf.AppID)
+	apiQuery.Set("secret",  a.todo.Conf.AppSecret)
 	apiQuery.Set("code", code)
 	apiQuery.Set("grant_type", "authorization_code")
 	api = fmt.Sprintf(api, apiQuery.Encode())
@@ -58,7 +61,7 @@ func (a *AccessTokenRes)Info() (res *SnsInfoRes, err error) {
 func (a *Api) List(next string) (res *ListRes, err error) {
 	api := "https://api.weixin.qq.com/cgi-bin/user/get"
 	get := internal.ToDoFuncGet(api, &res, "next_openid", next)
-	err = a.Do(get)
+	err = a.todo.Do(get)
 	return res, err
 }
 
@@ -66,6 +69,6 @@ func (a *Api) List(next string) (res *ListRes, err error) {
 func (a *Api) Info(openId string) (res *InfoRes, err error) {
 	api := "https://api.weixin.qq.com/cgi-bin/user/info"
 	get := internal.ToDoFuncGet(api, &res, "openid", openId, "lang", "zh_CN")
-	err = a.Do(get)
+	err = a.todo.Do(get)
 	return res, err
 }

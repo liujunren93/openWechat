@@ -8,6 +8,7 @@ type JsApiTicket struct {
 	Val       string `json:"ticket"`
 	ExpiresIn int64  `json:"expires_in"`
 	CreateAt  int64
+	Type      string
 }
 
 func (j *JsApiTicket) SetCreatedTime(i int64) {

@@ -16,8 +16,8 @@ var client *Client
 
 func init() {
 	store := file.NewStore("/Library/WebServer/Documents/gowork/src/openWechat/offiaccount/tt")
-	client = NewOfficialAccount("wx40a5b2247d31bddf", "5d4677b6498b90282585c573ac324a7a", store)
-	//client = NewOfficialAccount("wxc0f32e9fab6d06c9", "15ca38c49b2dfbcf1d1d9f4fc22efa2d", store)
+	//client = NewOfficialAccount("wx40a5b2247d31bddf", "5d4677b6498b90282585c573ac324a7a", store)
+	client = NewOfficialAccount("wxc0f32e9fab6d06c9", "15ca38c49b2dfbcf1d1d9f4fc22efa2d", store)
 
 }
 
@@ -174,6 +174,7 @@ func TestOffiAccount_MaterialApi_AddNews(t *testing.T) {
 
 //Ylfx1KKkztYhcz0ZQzhogei04pT46O1ZoxO1LhbcBjI
 func TestOffiAccount_MaterialApiInfo(t *testing.T) {
-	info, err := client.MaterialApi().MaterialInfo("cmy4CTVC2HUAA75tQFl9nc7BnInGdggOYH1nH-LBcwg")
-fmt.Println(info, err )
+		info, err := client.MaterialApi().MaterialInfo("cmy4CTVC2HUAA75tQFl9nRIFeG9R9k2Ff0nN6uU2zaM")
+		fmt.Println(info, err )
+
 }

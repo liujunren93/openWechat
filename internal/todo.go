@@ -191,7 +191,8 @@ func (t *Todo) GetTicket() (string, error) {
 	}
 	var res store.JsApiTicket
 	res.Type = "JsApiTicket"
-	err := t.ToDoFuncGet("https://api.weixin.qq.com/cgi-bin/ticket/getticket", &res, "type", "jsapi")
+	get := ToDoFuncGet("https://api.weixin.qq.com/cgi-bin/ticket/getticket", &res, "type", "jsapi")
+	err := t.Do(get)
 	if err != nil {
 		return "", err
 	}

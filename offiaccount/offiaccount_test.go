@@ -6,7 +6,6 @@ import (
 	"github.com/liujunren93/openWechat/offiaccount/api/material"
 	"github.com/liujunren93/openWechat/offiaccount/api/menu"
 	"github.com/liujunren93/openWechat/offiaccount/consts"
-	"github.com/liujunren93/openWechat/store/file"
 	"os"
 	"testing"
 	"time"
@@ -15,9 +14,9 @@ import (
 var client *Client
 
 func init() {
-	store := file.NewStore("/Library/WebServer/Documents/gowork/src/openWechat/offiaccount/tt")
+	//store := file.NewStore("/Library/WebServer/Documents/gowork/src/openWechat/offiaccount/tt")
 	//client = NewOfficialAccount("wx40a5b2247d31bddf", "5d4677b6498b90282585c573ac324a7a", store)
-	client = NewOfficialAccount("wxc0f32e9fab6d06c9", "15ca38c49b2dfbcf1d1d9f4fc22efa2d", store)
+	client = NewOfficialAccount("wx8d94f391e38fdccd", "6230f78197c0528ecf227ccce17c9cab", nil)
 
 }
 
@@ -108,10 +107,9 @@ func TestGetMenu(t *testing.T) {
 }
 
 func TestOffiAccount_Signature(t *testing.T) {
-	for i := 0; i < 10; i++ {
 		time.Sleep(time.Second)
-		client.Signature().Signature("111")
-	}
+		signature, err := client.Signature().Signature("111")
+		fmt.Println(signature, err )
 
 }
 

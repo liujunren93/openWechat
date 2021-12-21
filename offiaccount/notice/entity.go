@@ -6,7 +6,7 @@ import (
 )
 
 //ReceivingStandardMsgReq 文本消息 接收
-type ReceivingStandardMsgReq struct {
+type ReceivingStandardMsg struct {
 	ToUserName   string `xml:"ToUserName"`
 	FromUserName string `xml:"FromUserName"`
 	CreateTime   int64  `xml:"CreateTime"`
@@ -22,7 +22,7 @@ type ReceivingStandardMsgReq struct {
 	userlocation
 }
 
-func (r ReceivingStandardMsgReq)GetMsgType()string  {
+func (r ReceivingStandardMsg)GetMsgType()string  {
 	if r.text.Content!="" {
 		return "text"
 	}

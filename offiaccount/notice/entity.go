@@ -49,7 +49,7 @@ func (r ReceivingStandardMsg) GetMsgType() string {
 }
 
 type text struct {
-	Content types.CDATA `xml:"Content"`
+	Content string `xml:"Content"`
 }
 
 type pic struct {
@@ -102,7 +102,7 @@ func (m *passiveUserReplyMessage) SetBase(toUserName, FromUserName, MediaId stri
 type ReplyText struct {
 	XMLName xml.Name `xml:"xml"`
 	passiveUserReplyMessage
-	text
+	Content types.CDATA `xml:"context"`
 }
 
 func (m *ReplyText) Val(context string) {

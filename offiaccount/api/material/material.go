@@ -3,7 +3,7 @@ package material
 import (
 	"bytes"
 	"encoding/json"
-	"github.com/liujunren93/openWechat/offiaccount/internal"
+	"github.com/liujunren93/openWechat/internal"
 	"os"
 )
 

@@ -3,7 +3,7 @@ package user
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/liujunren93/openWechat/offiaccount/internal"
+	"github.com/liujunren93/openWechat/internal"
 	"github.com/liujunren93/openWechat/utils"
 	"net/url"
 )

@@ -2,7 +2,7 @@ package menu
 
 import (
 	"encoding/json"
-	"github.com/liujunren93/openWechat/offiaccount/internal"
+	"github.com/liujunren93/openWechat/internal"
 )
 
 type Api struct {

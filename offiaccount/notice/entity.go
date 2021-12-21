@@ -21,6 +21,32 @@ type ReceivingStandardMsgReq struct {
 	link
 	userlocation
 }
+
+func (r ReceivingStandardMsgReq)GetMsgType()string  {
+	if r.text.Content!="" {
+		return "text"
+	}
+	if r.pic.PicUrl!="" {
+		return "pic"
+	}
+	if r.voice.Format!="" {
+		return "voice"
+	}
+	if r.video.ThumbMediaId!="" {
+		return "video"
+	}
+	if r.location.Location_X!="" {
+		return "location"
+	}
+	if r.userlocation.Latitude!="" {
+		return "userlocation"
+	}
+	if r.link.Url!="" {
+		return "link"
+	}
+	return ""
+}
+
 type text struct {
 	Content string `xml:"Content"`
 }

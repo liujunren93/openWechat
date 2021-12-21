@@ -5,7 +5,6 @@ import (
 	"time"
 )
 
-
 //ReceivingStandardMsgReq 文本消息 接收
 type ReceivingStandardMsgReq struct {
 	ToUserName   string `xml:"ToUserName"`
@@ -20,6 +19,7 @@ type ReceivingStandardMsgReq struct {
 	video
 	location
 	link
+	userlocation
 }
 type text struct {
 	Content string `xml:"Content"`
@@ -42,6 +42,12 @@ type location struct {
 	Location_Y string `xml:"Location_Y"`
 	Scale      string `xml:"scale"`
 	Label      string `xml:"Label"`
+}
+
+type userlocation struct {
+	Latitude  string `xml:"Latitude"`
+	Longitude string `xml:"Longitude"`
+	Precision string `xml:"Precision"`
 }
 
 type link struct {
@@ -67,14 +73,14 @@ func (m *passiveUserReplyMessage) SetBase(toUserName, FromUserName, MediaId stri
 
 //ReplyText 文字
 type ReplyText struct {
-	XMLName    xml.Name `xml:"xml"`
+	XMLName xml.Name `xml:"xml"`
 	passiveUserReplyMessage
 	text
 }
 
 func (m *ReplyText) Val(context string) {
-	m.MsgType="text"
-	m.Content=context
+	m.MsgType = "text"
+	m.Content = context
 
 }
 

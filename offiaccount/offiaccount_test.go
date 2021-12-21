@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"github.com/liujunren93/openWechat/offiaccount/api/material"
 	"github.com/liujunren93/openWechat/offiaccount/api/menu"
-	"github.com/liujunren93/openWechat/offiaccount/consts"
 	"os"
 	"testing"
 	"time"
@@ -119,10 +118,6 @@ func TestOffiAccount_MaterialApi_UpTemporary(t *testing.T) {
 
 	res, err := client.MaterialApi().AddTemporary(material.NewImage(readFile, ""))
 	if err != nil {
-		if er, ok := err.(*consts.ErrorRes); ok {
-			fmt.Println(er)
-		}
-
 		fmt.Println(err)
 	}
 	fmt.Printf("%#v", res)

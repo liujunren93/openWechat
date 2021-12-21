@@ -1,4 +1,4 @@
-package consts
+package internal
 
 import "fmt"
 

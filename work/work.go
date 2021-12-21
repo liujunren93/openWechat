@@ -10,9 +10,9 @@ func NewOfficialAccount(appId, AppSecret string, s store.Store) *Client {
 	if s == nil {
 		s = memory.NewStore()
 	}
-	todo := internal.Todo{}
+	todo := core.Todo{}
 	todo.SetStore(s)
-	todo.SetConf(&internal.Config{
+	todo.SetConf(&core.Config{
 		AppID:     appId,
 		AppSecret: AppSecret,
 	})

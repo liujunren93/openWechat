@@ -3,9 +3,9 @@ package pay
 import "github.com/liujunren93/openWechat/internal"
 
 type Api struct {
-	todo *internal.Todo
+	todo *core.Todo
 }
-func NewApi(todo *internal.Todo) *Api {
+func NewApi(todo *core.Todo) *Api {
 	return &Api{todo: todo}
 }
 

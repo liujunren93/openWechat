@@ -49,7 +49,7 @@ func (r ReceivingStandardMsg) GetMsgType() string {
 }
 
 type text struct {
-	Content string `xml:"Content"`
+	Content types.CDATA `xml:"Content"`
 }
 
 type pic struct {
@@ -107,7 +107,7 @@ type ReplyText struct {
 
 func (m *ReplyText) Val(context string) {
 	m.MsgType = types.CDATA{Text: "text"}
-	m.Content = context
+	m.Content =types.CDATA{ Text:context}
 
 }
 

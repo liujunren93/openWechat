@@ -16,10 +16,7 @@ func NewApi(todo *internal.Todo) *Api {
 func (a *Api) List() (*resMenu, error) {
 	var res resMenu
 	api := "https://api.weixin.qq.com/cgi-bin/get_current_selfmenu_info"
-	f := internal.ToDoFuncGet(api, &res)
-
-	err := a.todo.Do(f)
-
+	err := a.todo.ToDoFuncGet(api, &res)
 	return &res, err
 
 }
@@ -28,7 +25,6 @@ func (a *Api) Create(menus *Menu) (err error) {
 	var req = map[string]*Menu{"button": menus}
 	api := "https://api.weixin.qq.com/cgi-bin/menu/create"
 	marshal, _ := json.Marshal(&req)
-	f := internal.ToDoFuncPost(api, nil, marshal)
-	err = a.todo.Do(f)
+	err = a.todo.ToDoFuncPost(api, nil, marshal)
 	return err
 }

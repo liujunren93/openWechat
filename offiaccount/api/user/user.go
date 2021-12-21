@@ -16,7 +16,7 @@ func NewApi(todo *internal.Todo) *Api {
 	return &Api{todo: todo}
 }
 
-//GetAccessToken 获取token
+//GetAccessToken 获取auth2 token js
 func (a *Api) GetAccessToken(code string) (res *AccessTokenRes, err error) {
 	api := "https://api.weixin.qq.com/sns/oauth2/access_token?%s"
 	apiQuery := url.Values{}
@@ -60,15 +60,13 @@ func (a *AccessTokenRes)Info() (res *SnsInfoRes, err error) {
 //GetUserList 拉取公众号粉丝列表
 func (a *Api) List(next string) (res *ListRes, err error) {
 	api := "https://api.weixin.qq.com/cgi-bin/user/get"
-	get := internal.ToDoFuncGet(api, &res, "next_openid", next)
-	err = a.todo.Do(get)
+	err = a.todo.ToDoFuncGet(api, &res, "next_openid", next)
 	return res, err
 }
 
 //GetUserInfo 用户详情unionid
 func (a *Api) Info(openId string) (res *InfoRes, err error) {
 	api := "https://api.weixin.qq.com/cgi-bin/user/info"
-	get := internal.ToDoFuncGet(api, &res, "openid", openId, "lang", "zh_CN")
-	err = a.todo.Do(get)
+	err = a.todo.ToDoFuncGet(api, &res, "openid", openId, "lang", "zh_CN")
 	return res, err
 }

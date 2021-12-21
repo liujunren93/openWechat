@@ -19,8 +19,7 @@ func NewApi(todo *internal.Todo) *Api {
 func (a *Api) AddTemporary(media media) (AddTemporaryRes, error) {
 	var res AddTemporaryRes
 	api := "https://api.weixin.qq.com/cgi-bin/media/upload"
-	f := internal.ToDoFuncPostForm(api, &res, media, nil, "type", media._type)
-	err := a.todo.Do(f)
+	err := a.todo.ToDoFuncPostForm(api, &res, media, nil, "type", media._type)
 	return res, err
 }
 
@@ -37,8 +36,7 @@ func (a *Api) AddNews(news ...News) (string, error) {
 	}
 	buf.Write(marshal)
 	buf.WriteString("}")
-	f := internal.ToDoFuncPost(api, &res, buf.Bytes())
-	err = a.todo.Do(f)
+	err = a.todo.ToDoFuncPost(api, &res, buf.Bytes())
 	return res.MediaID, err
 }
 
@@ -46,24 +44,21 @@ func (a *Api) UploadImg(file *os.File) (string, error) {
 	var res AddMaterialRes
 	api := "https://api.weixin.qq.com/cgi-bin/media/uploadimg"
 
-	f := internal.ToDoFuncPostForm(api, &res, NewImage(file, file.Name()), nil)
-	err := a.todo.Do(f)
+	err := a.todo.ToDoFuncPostForm(api, &res, NewImage(file, file.Name()), nil)
 	return res.Url, err
 }
 
 func (a *Api) AddMaterial(media media, videDesc map[string]string) (AddMaterialRes, error) {
 	var res AddMaterialRes
 	api := "https://api.weixin.qq.com/cgi-bin/material/add_material"
-	f := internal.ToDoFuncPostForm(api, &res, media, videDesc, "type", media._type)
-	err := a.todo.Do(f)
+	err := a.todo.ToDoFuncPostForm(api, &res, media, videDesc, "type", media._type)
 	return res, err
 }
 
 func (a *Api) MaterialInfo(id string) (MaterialsInfoRes, error) {
 	var res MaterialsInfoRes
 	api := "https://api.weixin.qq.com/cgi-bin/material/get_material"
-	f := internal.ToDoFuncPost(api, &res, []byte(`{"media_id":`+id+`}`))
-	err := a.todo.Do(f)
+	err := a.todo.ToDoFuncPost(api, &res, []byte(`{"media_id":`+id+`}`))
 	return res, err
 }
 
@@ -76,7 +71,6 @@ func (a *Api) BatchGetMaterial(mType string, offset, count int) (BatchMaterialRe
 	api := "https://api.weixin.qq.com/cgi-bin/material/batchget_material"
 	var req = map[string]interface{}{"type": mType, "offset": offset, "count": count}
 	marshal, _ := json.Marshal(req)
-	f := internal.ToDoFuncPost(api, &res, marshal)
-	err := a.todo.Do(f)
+	err := a.todo.ToDoFuncPost(api, &res, marshal)
 	return res, err
 }

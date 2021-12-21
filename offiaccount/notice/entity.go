@@ -2,6 +2,7 @@ package notice
 
 import (
 	"encoding/xml"
+	"github.com/liujunren93/openWechat/types"
 	"time"
 )
 
@@ -22,26 +23,26 @@ type ReceivingStandardMsg struct {
 	userlocation
 }
 
-func (r ReceivingStandardMsg)GetMsgType()string  {
-	if r.text.Content!="" {
+func (r ReceivingStandardMsg) GetMsgType() string {
+	if r.text.Content != "" {
 		return "text"
 	}
-	if r.pic.PicUrl!="" {
+	if r.pic.PicUrl != "" {
 		return "pic"
 	}
-	if r.voice.Format!="" {
+	if r.voice.Format != "" {
 		return "voice"
 	}
-	if r.video.ThumbMediaId!="" {
+	if r.video.ThumbMediaId != "" {
 		return "video"
 	}
-	if r.location.Location_X!="" {
+	if r.location.Location_X != "" {
 		return "location"
 	}
-	if r.userlocation.Latitude!="" {
+	if r.userlocation.Latitude != "" {
 		return "userlocation"
 	}
-	if r.link.Url!="" {
+	if r.link.Url != "" {
 		return "link"
 	}
 	return ""
@@ -83,16 +84,16 @@ type link struct {
 }
 
 type passiveUserReplyMessage struct {
-	ToUserName   string `xml:"ToUserName"`
-	FromUserName string `xml:"FromUserName"`
-	CreateTime   int64  `xml:"CreateTime"`
-	MsgType      string `xml:"MsgType"` //text,image,语音为voice,语音格式：amr,视频为video,小视频为shortvideo,地理位置为location,链接为link
+	ToUserName   types.CDATA `xml:"ToUserName"`
+	FromUserName types.CDATA `xml:"FromUserName"`
+	CreateTime   int64       `xml:"CreateTime"`
+	MsgType      types.CDATA `xml:"MsgType"` //text,image,语音为voice,语音格式：amr,视频为video,小视频为shortvideo,地理位置为location,链接为link
 }
 
 func (m *passiveUserReplyMessage) SetBase(toUserName, FromUserName, MediaId string) {
 	*m = passiveUserReplyMessage{
-		ToUserName:   toUserName,
-		FromUserName: FromUserName,
+		ToUserName:   types.CDATA{Text: toUserName},
+		FromUserName: types.CDATA{Text: FromUserName},
 		CreateTime:   time.Now().Local().Unix(),
 	}
 }
@@ -105,7 +106,7 @@ type ReplyText struct {
 }
 
 func (m *ReplyText) Val(context string) {
-	m.MsgType = "text"
+	m.MsgType = types.CDATA{Text: "text"}
 	m.Content = context
 
 }
@@ -117,28 +118,28 @@ type ReplyImage struct {
 type ReplyVoice struct {
 	passiveUserReplyMessage
 	Voice struct {
-		MediaId string `xml:"MediaId"`
+		MediaId types.CDATA  `xml:"MediaId"`
 	} `xml:"Voice"`
 }
 
 type ReplyVideo struct {
 	passiveUserReplyMessage
 	Video struct {
-		MediaId     string `xml:"MediaId"`
-		Title       string `xml:"Title"`
-		Description string `xml:"Description"`
+		MediaId     types.CDATA  `xml:"MediaId"`
+		Title       types.CDATA  `xml:"Title"`
+		Description types.CDATA  `xml:"Description"`
 	} `xml:"Video"`
 }
 
 type ReplyMusic struct {
 	passiveUserReplyMessage
 	Music struct {
-		MediaId      string `xml:"MediaId"`
-		Title        string `xml:"Title"`
-		Description  string `xml:"Description"`
-		MusicUrl     string `xml:"MusicUrl"`
-		HQMusicUrl   string `xml:"HQMusicUrl"`
-		ThumbMediaId string `xml:"ThumbMediaId"`
+		MediaId      types.CDATA  `xml:"MediaId"`
+		Title        types.CDATA  `xml:"Title"`
+		Description  types.CDATA  `xml:"Description"`
+		MusicUrl     types.CDATA  `xml:"MusicUrl"`
+		HQMusicUrl   types.CDATA  `xml:"HQMusicUrl"`
+		ThumbMediaId types.CDATA  `xml:"ThumbMediaId"`
 	} `xml:"Music"`
 }
 
@@ -151,9 +152,9 @@ type ReplyNews struct {
 
 type articles struct {
 	Item []struct {
-		Title       string `xml:"Title"`
-		Description string `xml:"Description"`
-		PicUrl      string `xml:"PicUrl"`
-		Url         string `xml:"url"`
+		Title       types.CDATA  `xml:"Title"`
+		Description types.CDATA  `xml:"Description"`
+		PicUrl      types.CDATA  `xml:"PicUrl"`
+		Url         types.CDATA  `xml:"url"`
 	}
 }

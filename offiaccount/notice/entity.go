@@ -102,7 +102,7 @@ func (m *passiveUserReplyMessage) SetBase(toUserName, FromUserName, MediaId stri
 type ReplyText struct {
 	XMLName xml.Name `xml:"xml"`
 	passiveUserReplyMessage
-	Content types.CDATA `xml:"context"`
+	Content types.CDATA `xml:"Content"`
 }
 
 func (m *ReplyText) Val(context string) {

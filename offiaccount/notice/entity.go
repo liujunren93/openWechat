@@ -105,7 +105,7 @@ type ReplyText struct {
 	Content types.CDATA `xml:"Content"`
 }
 
-func (m *ReplyText) Val(context string) {
+func (m *ReplyText) SetVal(context string) {
 	m.MsgType = types.CDATA{Text: "text"}
 	m.Content = types.CDATA{Text: context}
 

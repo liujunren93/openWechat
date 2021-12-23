@@ -107,7 +107,7 @@ type ReplyText struct {
 
 func (m *ReplyText) Val(context string) {
 	m.MsgType = types.CDATA{Text: "text"}
-	m.Content =types.CDATA{ Text:context}
+	m.Content = types.CDATA{Text: context}
 
 }
 
@@ -118,28 +118,28 @@ type ReplyImage struct {
 type ReplyVoice struct {
 	passiveUserReplyMessage
 	Voice struct {
-		MediaId types.CDATA  `xml:"MediaId"`
+		MediaId types.CDATA `xml:"MediaId"`
 	} `xml:"Voice"`
 }
 
 type ReplyVideo struct {
 	passiveUserReplyMessage
 	Video struct {
-		MediaId     types.CDATA  `xml:"MediaId"`
-		Title       types.CDATA  `xml:"Title"`
-		Description types.CDATA  `xml:"Description"`
+		MediaId     types.CDATA `xml:"MediaId"`
+		Title       types.CDATA `xml:"Title"`
+		Description types.CDATA `xml:"Description"`
 	} `xml:"Video"`
 }
 
 type ReplyMusic struct {
 	passiveUserReplyMessage
 	Music struct {
-		MediaId      types.CDATA  `xml:"MediaId"`
-		Title        types.CDATA  `xml:"Title"`
-		Description  types.CDATA  `xml:"Description"`
-		MusicUrl     types.CDATA  `xml:"MusicUrl"`
-		HQMusicUrl   types.CDATA  `xml:"HQMusicUrl"`
-		ThumbMediaId types.CDATA  `xml:"ThumbMediaId"`
+		MediaId      types.CDATA `xml:"MediaId"`
+		Title        types.CDATA `xml:"Title"`
+		Description  types.CDATA `xml:"Description"`
+		MusicUrl     types.CDATA `xml:"MusicUrl"`
+		HQMusicUrl   types.CDATA `xml:"HQMusicUrl"`
+		ThumbMediaId types.CDATA `xml:"ThumbMediaId"`
 	} `xml:"Music"`
 }
 
@@ -151,10 +151,12 @@ type ReplyNews struct {
 }
 
 type articles struct {
-	Item []struct {
-		Title       types.CDATA  `xml:"Title"`
-		Description types.CDATA  `xml:"Description"`
-		PicUrl      types.CDATA  `xml:"PicUrl"`
-		Url         types.CDATA  `xml:"url"`
-	}
+	Item []Item
+}
+
+type Item struct {
+	Title       types.CDATA `xml:"Title"`
+	Description types.CDATA `xml:"Description"`
+	PicUrl      types.CDATA `xml:"PicUrl"`
+	Url         types.CDATA `xml:"url"`
 }

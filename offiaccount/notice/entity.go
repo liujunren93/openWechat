@@ -151,10 +151,10 @@ type ReplyNews struct {
 }
 
 type articles struct {
-	Item []Item
+	Item []ReplyNewsItem
 }
 
-type Item struct {
+type ReplyNewsItem struct {
 	Title       types.CDATA `xml:"Title"`
 	Description types.CDATA `xml:"Description"`
 	PicUrl      types.CDATA `xml:"PicUrl"`

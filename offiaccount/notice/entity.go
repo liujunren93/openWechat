@@ -107,9 +107,9 @@ type ReplyText struct {
 
 func NewReplyText(toUserName, FromUserName, content string) ReplyText {
 	text := ReplyText{}
+	text.SetBase(toUserName, FromUserName, "")
 	text.Content = types.CDATA{Text: content}
 	text.MsgType = types.CDATA{Text: "text"}
-	text.SetBase(toUserName, FromUserName, "")
 	return text
 }
 

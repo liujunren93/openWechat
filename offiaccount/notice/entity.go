@@ -105,6 +105,14 @@ type ReplyText struct {
 	Content types.CDATA `xml:"Content"`
 }
 
+func NewReplyText(toUserName, FromUserName, content string) ReplyText {
+	text := ReplyText{}
+	text.Content = types.CDATA{Text: content}
+	text.MsgType = types.CDATA{Text: "text"}
+	text.SetBase(toUserName, FromUserName, "")
+	return text
+}
+
 func (m *ReplyText) SetVal(context string) {
 	m.MsgType = types.CDATA{Text: "text"}
 	m.Content = types.CDATA{Text: context}

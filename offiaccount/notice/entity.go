@@ -21,6 +21,7 @@ type ReceivingStandardMsg struct {
 	location
 	link
 	userlocation
+	event
 }
 
 func (r ReceivingStandardMsg) GetMsgType() string {
@@ -45,9 +46,15 @@ func (r ReceivingStandardMsg) GetMsgType() string {
 	if r.link.Url != "" {
 		return "link"
 	}
+	if r.MsgType=="event" {
+		return "event"
+	}
 	return ""
 }
 
+type event struct {
+	Event string `xml:"Event"`
+}
 type text struct {
 	Content string `xml:"Content"`
 }

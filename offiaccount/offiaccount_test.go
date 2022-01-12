@@ -15,7 +15,7 @@ var client *Client
 func init() {
 	//store := file.NewStore("/Library/WebServer/Documents/gowork/src/openWechat/offiaccount/tt")
 	//client = NewOfficialAccount("wx40a5b2247d31bddf", "5d4677b6498b90282585c573ac324a7a", store)
-	client = NewOfficialAccount("wx8d94f391e38fdccd", "6230f78197c0528ecf227ccce17c9cab", nil)
+	client = NewOfficialAccount("wx40a5b2247d31bddf", "5d4677b6498b90282585c573ac324a7a", nil)
 
 }
 
@@ -45,6 +45,14 @@ func TestSetMenu(t *testing.T) {
 	newMenu.AddClickBtn("btn1", "btn1").AddScancodePushBtn("scan", "scan")
 	newMenu.AddClickBtn("btn2","btn2").AddViewBtn("btn1-1","btn1-1","http://baidu.com","","")
 	newMenu.AddClickBtn("btn3","btn3").AddLocationSelectBtn("local","local").AddPicWeixinBtn("wxPic","wp")
+	err := client.MenuApi().Create(newMenu)
+	fmt.Println(err)
+}
+
+func TestSetZbMenu(t *testing.T) {
+	newMenu := menu.NewMenu()
+	newMenu.AddViewBtn("淘便宜","tpy_btn","http://www.sharelife.club/rim_h5//#/tpy/list","","")
+	newMenu.AddViewBtn("淘便宜","tpy_btn","http://www.sharelife.club/rim_h5//#/tpy/list","","")
 	err := client.MenuApi().Create(newMenu)
 	fmt.Println(err)
 }

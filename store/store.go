@@ -41,6 +41,9 @@ func (da DataVal) GetVal() string {
 }
 
 func (da DataVal) IsExpire() bool {
+	if da != nil {
+		return true
+	}
 	if da["expire_in"].(int64) < time.Now().Local().Unix() {
 		return true
 	}

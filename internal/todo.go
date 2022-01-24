@@ -167,6 +167,7 @@ func (t *Todo) getAccessToken() (token store.DataVal, err error) {
 		apiUrl += "?grant_type=client_credential&AppId=" + t.Conf.AppID + "&secret=" + t.Conf.AppSecret
 		get, _ := utils.HttpGet(apiUrl)
 		var res = store.AccessToken{}
+		token= make(store.DataVal)
 		err = json.Unmarshal(get, &res)
 		if err != nil {
 			return

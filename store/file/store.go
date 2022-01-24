@@ -2,12 +2,12 @@ package file
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	iStore "github.com/liujunren93/openWechat/store"
 	"github.com/liujunren93/openWechat/store/memory"
 	"io"
 	"os"
-	"strings"
 )
 
 type store struct {
@@ -16,8 +16,6 @@ type store struct {
 	storeMap map[string]map[string]iStore.Data
 	mstore   iStore.Store
 }
-
-
 
 func (s *store) Load(namespace, appId string) (iStore.Data, error) {
 	if load, ok := s.mstore.Load(namespace, appId); ok != nil {
@@ -46,15 +44,13 @@ func (s *store) syncFile(namespace, appId string, data iStore.Data) error {
 		return err
 	}
 	if all == nil {
-		all = map[string]map[string]iStore.DataVal{}
-	} else {
-		all[namespace][appId] = data.(iStore.DataVal)
+		all = map[string]map[string]iStore.DataVal{namespace: {appId:data.(iStore.DataVal)}}
 	}
-
 	marshal, err := json.Marshal(all)
 	if err != nil {
 		return err
 	}
+	s.file.Truncate(0)
 	_, err = s.file.Write(marshal)
 	return err
 }
@@ -66,13 +62,16 @@ func (s *store) localAll() (map[string]map[string]iStore.DataVal, error) {
 		}
 		s.file = open
 	}
-	var data =make(map[string]map[string]iStore.DataVal)
+	var data = make(map[string]map[string]iStore.DataVal)
 	all, err := io.ReadAll(s.file)
 	if err != nil {
 		return nil, err
 	}
+	if !json.Valid(all){
+		return nil, nil
+	}
 	err = json.Unmarshal(all, &data)
-	if err!=nil&&strings.Contains(err.Error(), "unexpected end of JSON input") {
+	if err != nil {
 		return nil, nil
 	}
 
@@ -85,8 +84,10 @@ func (s *store) IsExpire(namespace, appId string) bool {
 	if !expire { //未过期
 		return expire
 	}
-	data, _ := s.syncMem(namespace, appId)
-
+	data, err := s.syncMem(namespace, appId)
+	if errors.Is(err, iStore.NilError) {
+		return true
+	}
 	return data.IsExpire()
 }
 

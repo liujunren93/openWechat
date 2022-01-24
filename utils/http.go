@@ -9,15 +9,17 @@ import (
 	"net/http"
 	"os"
 	"strings"
+	"time"
 )
 
+var defaultHttpClient=http.Client{Timeout: time.Second*3}
 func HttpGet(url string) ([]byte, error) {
 	request, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		return nil, err
 	}
-	client := http.Client{}
-	do, err := client.Do(request)
+
+	do, err := defaultHttpClient.Do(request)
 	if err != nil {
 		return nil, err
 	}
@@ -37,6 +39,7 @@ func HttpPost(url string, header http.Header, data []byte) ([]byte, error) {
 	}
 	request.Header = header
 	client := http.Client{}
+	client.Timeout=time.Second*3
 	do, err := client.Do(request)
 	if err != nil {
 		return nil, err
@@ -85,8 +88,8 @@ func HttpPostForm(url string, header http.Header, data map[string]string, files 
 		panic(err)
 	}
 	request.Header = header
-	client := http.DefaultClient
-	res, err := client.Do(request)
+
+	res, err := defaultHttpClient.Do(request)
 	defer res.Body.Close()
 	return io.ReadAll(res.Body)
 }

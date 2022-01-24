@@ -30,8 +30,6 @@ func NewTodo(conf *Config, appType string) *Todo {
 	}
 }
 
-
-
 func (t *Todo) SetStore(store store.Store) {
 	t.store = store
 }
@@ -76,7 +74,7 @@ func (t *Todo) ToDoFuncPostForm(api string, res interface{}, file utils.File, da
 	}
 	return t.do(func(token string) ([]byte, error) {
 		api = buildApi(api, token, kv)
-		re, err := utils.HttpPostForm(api, nil,data, file)
+		re, err := utils.HttpPostForm(api, nil, data, file)
 		if err != nil {
 			return re, err
 		}
@@ -104,7 +102,7 @@ func (t *Todo) ToDoFuncPost(api string, res interface{}, data []byte, kv ...stri
 	}
 	return t.do(func(token string) ([]byte, error) {
 		api = buildApi(api, token, kv)
-		re, err := utils.HttpPost(api,nil, data)
+		re, err := utils.HttpPost(api, nil, data)
 		if err != nil {
 			return re, err
 		}
@@ -159,27 +157,31 @@ retry:
 }
 
 // 获取accessToken
-func (t *Todo) getAccessToken() (token *store.AccessToken, err error) {
+func (t *Todo) getAccessToken() (token store.DataVal, err error) {
 	t.mutex.Lock()
 	defer t.mutex.Unlock()
+	defer t.store.Close()
 	apiUrl := "https://api.weixin.qq.com/cgi-bin/token"
-	if t.retry > 0 || t.store.IsExpire(t.appType+"accessToken", t.Conf.AppID) {
+
+	if t.store.IsExpire(t.appType+"accessToken", t.Conf.AppID) {
 		apiUrl += "?grant_type=client_credential&AppId=" + t.Conf.AppID + "&secret=" + t.Conf.AppSecret
 		get, _ := utils.HttpGet(apiUrl)
-		err = json.Unmarshal(get, &token)
+		var res = store.AccessToken{}
+		err = json.Unmarshal(get, &res)
 		if err != nil {
 			return
 		}
-		token.SetCreatedTime(time.Now().Local().Unix())
-		token.Type = "AccessToken"
+		token.SetExpire(7100)
+		token.SetVal(res.Val)
+		token["type"] = "AccessToken"
 		err = t.store.Store(t.appType+"accessToken", t.Conf.AppID, token)
 		t.retry = 0
 	} else {
-		if val, ok := t.store.Load(t.appType+"accessToken", t.Conf.AppID); ok && t.retry == 0 {
-			if time.Now().Local().Unix()-val.GetCreateTime() < val.GetExpire()-100 { // 未过期
-				return val.(*store.AccessToken), nil
-			}
+		load, err := t.store.Load(t.appType+"accessToken", t.Conf.AppID)
+		if err != nil {
+			return nil, err
 		}
+		return load.(store.DataVal), nil
 	}
 
 	return
@@ -189,8 +191,8 @@ func (t *Todo) getAccessToken() (token *store.AccessToken, err error) {
 //
 func (t *Todo) GetTicket() (string, error) {
 	// 判断是否过期
-	if load, ok := t.store.Load(t.appType+"ticket", t.Conf.AppID); ok {
-		if time.Now().Local().Unix()-load.GetCreateTime() < load.GetExpire()-100 { // 未过期
+	if load, err := t.store.Load(t.appType+"ticket", t.Conf.AppID); err == nil {
+		if load.IsExpire() { // 未过期
 			return load.GetVal(), nil
 		}
 	}
@@ -204,6 +206,8 @@ func (t *Todo) GetTicket() (string, error) {
 	if res.ErrCode != 0 {
 		return "", err
 	}
+	res.SetExpire(7100)
+	res.CreateAt = time.Now().Local().Unix()
 	err = t.store.Store(t.appType+"ticket", t.Conf.AppID, &res)
 	return res.GetVal(), nil
 }

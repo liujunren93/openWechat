@@ -19,14 +19,18 @@ func (j *JsApiTicket) SetVal(s string) {
 	j.Val = s
 }
 
-func (j *JsApiTicket) GetCreateTime() int64 {
-	return j.CreateAt
+func (j *JsApiTicket) IsExpire() bool {
+	if j.ExpiresIn < time.Now().Local().Unix() {
+		return true
+	}
+	return false
 }
 
-func (j *JsApiTicket) GetExpire() int64 {
-	return j.ExpiresIn
+func (j *JsApiTicket) SetExpire(expire int64) {
+	j.ExpiresIn = time.Now().Local().Unix() + expire
 }
 
 func (j *JsApiTicket) GetVal() string {
 	return j.Val
 }
+

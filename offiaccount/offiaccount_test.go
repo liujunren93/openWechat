@@ -1,10 +1,10 @@
 package offiAccount
 
 import (
-	"encoding/json"
 	"fmt"
 	"github.com/liujunren93/openWechat/offiaccount/api/material"
 	"github.com/liujunren93/openWechat/offiaccount/api/menu"
+	"github.com/liujunren93/openWechat/store/file"
 	"os"
 	"testing"
 	"time"
@@ -13,9 +13,9 @@ import (
 var client *Client
 
 func init() {
-	//store := file.NewStore("/Library/WebServer/Documents/gowork/src/openWechat/offiaccount/tt")
-	//client = NewOfficialAccount("wx40a5b2247d31bddf", "5d4677b6498b90282585c573ac324a7a", store)
-	client = NewOfficialAccount("wx40a5b2247d31bddf", "5d4677b6498b90282585c573ac324a7a", nil)
+	store := file.NewStore("tt.json")
+	client = NewOfficialAccount("wx40a5b2247d31bddf", "5d4677b6498b90282585c573ac324a7a", store)
+	//client = NewOfficialAccount("wx40a5b2247d31bddf", "5d4677b6498b90282585c573ac324a7a", nil)
 
 }
 
@@ -34,7 +34,7 @@ func TestNewOfficialAccount(t *testing.T) {
 
 func TestA(t *testing.T) {
 	for {
-		list, err := client.UserApi().Info("ouKLl6cS6JaR7Rqvxl220gwRjnC0")
+		list, err := client.UserApi().Info("omunIv86qHc7O1rpxuCUNeLkYies")
 		fmt.Println(list, err)
 		time.Sleep(time.Second * 100)
 	}
@@ -57,60 +57,11 @@ func TestSetZbMenu(t *testing.T) {
 	fmt.Println(err)
 }
 
-func TestSetMenu1(t *testing.T) {
-	var me = `[
-            {
-                "name":"btn1111",
-                "sub_button":[
-                        {
-                            "type":"click",
-                            "name":"btn111111-1",
-                            "key":"btn1-1"
-                        }
-                    ]
-                
-            },
-            {
-                "name":"btn2",
-                "sub_button":[
-                        {
-                            "type":"view",
-                            "name":"btn1-1",
-                            "url":"http:\/\/baidu.com"
-                        }
-                    ]
-                
-            },
-            {
-                "name":"btn3",
-                "sub_button":[
-                        {
-                            "type":"location_select",
-                            "name":"local",
-                            "key":"local"
-                        },
-                        {
-                            "type":"pic_weixin",
-                            "name":"wxPic",
-                            "key":"wp"
-                        }
-                    ]
-                
-            }
-        ]`
-	var data = menu.NewMenu()
-	json.Unmarshal([]byte(me), data)
-	fmt.Println(data)
-
-	fmt.Printf("%#v", data)
-	err := client.MenuApi().Create(data)
-	fmt.Println(err)
-}
 
 func TestGetMenu(t *testing.T) {
-	list, _ := client.MenuApi().List()
+	list, err := client.MenuApi().List()
 	//err := client.MenuApi().Create(list.ToMenu())
-	fmt.Println(list)
+	fmt.Println(list,err)
 }
 
 func TestOffiAccount_Signature(t *testing.T) {

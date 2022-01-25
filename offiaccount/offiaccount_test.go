@@ -19,7 +19,7 @@ func init() {
 		Network: "tcp",
 		Addr:    "node1:6379",
 	})
-	store,err:=redis.NewStore(newClient,"test")
+	store, err := redis.NewStore(newClient, "test")
 	if err != nil {
 		panic(err)
 	}
@@ -67,12 +67,10 @@ func TestSetZbMenu(t *testing.T) {
 }
 
 func TestGetMenu(t *testing.T) {
-	for {
+
 		list, err := client.MenuApi().List()
 		//err := client.MenuApi().Create(list.ToMenu())
 		fmt.Println(list, err)
-		time.Sleep(time.Second)
-	}
 
 }
 
@@ -149,5 +147,15 @@ func TestSign(t *testing.T) {
 		signature, err := client.Signature().Signature("127.0.0.1")
 		fmt.Println(signature, err)
 	}
+
+}
+
+//Ylfx1KKkztYhcz0ZQzhogei04pT46O1ZoxO1LhbcBjI
+func TestUpImage(*testing.T) {
+	file, err := os.Open("./aa.png")
+	if err != nil {
+		panic(err)
+	}
+	client.Utils().UploadImg(file)
 
 }

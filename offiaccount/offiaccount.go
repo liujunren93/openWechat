@@ -6,6 +6,7 @@ import (
 	"github.com/liujunren93/openWechat/offiaccount/api/menu"
 	"github.com/liujunren93/openWechat/offiaccount/api/signature"
 	"github.com/liujunren93/openWechat/offiaccount/api/user"
+	"github.com/liujunren93/openWechat/offiaccount/api/utils"
 	"github.com/liujunren93/openWechat/store"
 	"sync"
 )
@@ -68,6 +69,16 @@ func (o *Client) Signature() *signature.Api {
 	} else {
 		api := signature.NewApi(o.toDo)
 		o.apiMap.Store(signature.Api{}, api)
+		return api
+	}
+
+}
+func (o *Client) Utils() *utils.Api {
+	if v, ok := o.apiMap.Load(utils.Api{}); ok {
+		return v.(*utils.Api)
+	} else {
+		api := utils.NewApi(o.toDo)
+		o.apiMap.Store(utils.Api{}, api)
 		return api
 	}
 

@@ -2,9 +2,10 @@ package offiAccount
 
 import (
 	"fmt"
+	redis2 "github.com/go-redis/redis/v8"
 	"github.com/liujunren93/openWechat/offiaccount/api/material"
 	"github.com/liujunren93/openWechat/offiaccount/api/menu"
-	"github.com/liujunren93/openWechat/store/file"
+	"github.com/liujunren93/openWechat/store/redis"
 	"os"
 	"testing"
 	"time"
@@ -13,7 +14,15 @@ import (
 var client *Client
 
 func init() {
-	store := file.NewStore("tt.json")
+	//store := file.NewStore("tt.json")
+	newClient := redis2.NewClient(&redis2.Options{
+		Network: "tcp",
+		Addr:    "node1:6379",
+	})
+	store,err:=redis.NewStore(newClient,"test")
+	if err != nil {
+		panic(err)
+	}
 	client = NewOfficialAccount("wx40a5b2247d31bddf", "5d4677b6498b90282585c573ac324a7a", store)
 	//client = NewOfficialAccount("wx40a5b2247d31bddf", "5d4677b6498b90282585c573ac324a7a", nil)
 
@@ -43,31 +52,34 @@ func TestA(t *testing.T) {
 func TestSetMenu(t *testing.T) {
 	newMenu := menu.NewMenu()
 	newMenu.AddClickBtn("btn1", "btn1").AddScancodePushBtn("scan", "scan")
-	newMenu.AddClickBtn("btn2","btn2").AddViewBtn("btn1-1","btn1-1","http://baidu.com","","")
-	newMenu.AddClickBtn("btn3","btn3").AddLocationSelectBtn("local","local").AddPicWeixinBtn("wxPic","wp")
+	newMenu.AddClickBtn("btn2", "btn2").AddViewBtn("btn1-1", "btn1-1", "http://baidu.com", "", "")
+	newMenu.AddClickBtn("btn3", "btn3").AddLocationSelectBtn("local", "local").AddPicWeixinBtn("wxPic", "wp")
 	err := client.MenuApi().Create(newMenu)
 	fmt.Println(err)
 }
 
 func TestSetZbMenu(t *testing.T) {
 	newMenu := menu.NewMenu()
-	newMenu.AddViewBtn("淘便宜","tpy_btn","http://www.sharelife.club/rim_h5//#/tpy/list","","")
-	newMenu.AddViewBtn("淘便宜","tpy_btn","http://www.sharelife.club/rim_h5//#/tpy/list","","")
+	newMenu.AddViewBtn("淘便宜", "tpy_btn", "http://www.sharelife.club/rim_h5//#/tpy/list", "", "")
+	newMenu.AddViewBtn("淘便宜", "tpy_btn", "http://www.sharelife.club/rim_h5//#/tpy/list", "", "")
 	err := client.MenuApi().Create(newMenu)
 	fmt.Println(err)
 }
 
-
 func TestGetMenu(t *testing.T) {
-	list, err := client.MenuApi().List()
-	//err := client.MenuApi().Create(list.ToMenu())
-	fmt.Println(list,err)
+	for {
+		list, err := client.MenuApi().List()
+		//err := client.MenuApi().Create(list.ToMenu())
+		fmt.Println(list, err)
+		time.Sleep(time.Second)
+	}
+
 }
 
 func TestOffiAccount_Signature(t *testing.T) {
-		time.Sleep(time.Second)
-		signature, err := client.Signature().Signature("111")
-		fmt.Println(signature, err )
+	time.Sleep(time.Second)
+	signature, err := client.Signature().Signature("111")
+	fmt.Println(signature, err)
 
 }
 
@@ -109,7 +121,7 @@ func TestOffiAccount_MaterialApi_AddNews(t *testing.T) {
 		ContentSourceUrl:   "https://baidu.com",
 		NeedOpenComment:    true,
 		OnlyFansCanComment: true,
-	},material.News{
+	}, material.News{
 		Title:              "ttt1",
 		ThumbMediaID:       "Ylfx1KKkztYhcz0ZQzhogZ7oZ-nyaci-h2krZYPUPy0",
 		ShowCoverPic:       true,
@@ -126,7 +138,16 @@ func TestOffiAccount_MaterialApi_AddNews(t *testing.T) {
 
 //Ylfx1KKkztYhcz0ZQzhogei04pT46O1ZoxO1LhbcBjI
 func TestOffiAccount_MaterialApiInfo(t *testing.T) {
-		info, err := client.MaterialApi().MaterialInfo("cmy4CTVC2HUAA75tQFl9nRIFeG9R9k2Ff0nN6uU2zaM")
-		fmt.Println(info, err )
+	info, err := client.MaterialApi().MaterialInfo("cmy4CTVC2HUAA75tQFl9nRIFeG9R9k2Ff0nN6uU2zaM")
+	fmt.Println(info, err)
+
+}
+
+//Ylfx1KKkztYhcz0ZQzhogei04pT46O1ZoxO1LhbcBjI
+func TestSign(t *testing.T) {
+	for {
+		signature, err := client.Signature().Signature("127.0.0.1")
+		fmt.Println(signature, err)
+	}
 
 }

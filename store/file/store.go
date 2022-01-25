@@ -13,12 +13,11 @@ import (
 type store struct {
 	fileName string
 	file     *os.File
-	storeMap map[string]map[string]iStore.Data
 	mstore   iStore.Store
 }
 
 func (s *store) Load(namespace, appId string) (iStore.Data, error) {
-	if load, ok := s.mstore.Load(namespace, appId); ok != nil {
+	if load, ok := s.mstore.Load(namespace, appId); ok == nil {
 		return load, nil
 	}
 	return s.syncMem(namespace, appId)
@@ -44,14 +43,16 @@ func (s *store) syncFile(namespace, appId string, data iStore.Data) error {
 		return err
 	}
 	if all == nil {
-		all = map[string]map[string]iStore.DataVal{namespace: {appId:data.(iStore.DataVal)}}
+		all = map[string]map[string]iStore.DataVal{namespace: {appId: data.(iStore.DataVal)}}
+	} else {
+		all[namespace]= map[string]iStore.DataVal{appId:data.(iStore.DataVal)}
 	}
 	marshal, err := json.Marshal(all)
 	if err != nil {
 		return err
 	}
 	s.file.Truncate(0)
-	_, err = s.file.Write(marshal)
+	_, err = s.file.WriteAt(marshal, 0)
 	return err
 }
 func (s *store) localAll() (map[string]map[string]iStore.DataVal, error) {
@@ -62,13 +63,11 @@ func (s *store) localAll() (map[string]map[string]iStore.DataVal, error) {
 		}
 		s.file = open
 	}
+	s.file.Seek(0, 0)
 	var data = make(map[string]map[string]iStore.DataVal)
 	all, err := io.ReadAll(s.file)
 	if err != nil {
 		return nil, err
-	}
-	if !json.Valid(all){
-		return nil, nil
 	}
 	err = json.Unmarshal(all, &data)
 	if err != nil {
@@ -104,7 +103,12 @@ func (s *store) Close() error {
 	if s.file == nil {
 		return nil
 	}
-	return s.file.Close()
+	err := s.file.Close()
+	s.file = nil
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func NewStore(fileName string) *store {

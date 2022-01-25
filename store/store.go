@@ -32,7 +32,7 @@ func (da DataVal) SetCreateAt() {
 }
 
 func (da DataVal) SetExpire(expire int64) {
-	da["expire_in"] = time.Now().Local().Unix() + expire
+	da["expire_in"] = float64(time.Now().Local().Unix() + expire)
 	return
 }
 
@@ -41,10 +41,10 @@ func (da DataVal) GetVal() string {
 }
 
 func (da DataVal) IsExpire() bool {
-	if da != nil {
+	if da == nil {
 		return true
 	}
-	if da["expire_in"].(int64) < time.Now().Local().Unix() {
+	if int64(da["expire_in"].(float64) )< time.Now().Local().Unix() {
 		return true
 	}
 	return false

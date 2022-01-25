@@ -8,8 +8,8 @@ import (
 	"log"
 	"net/url"
 	"reflect"
+	"strings"
 	"sync"
-	"time"
 )
 
 type Todo struct {
@@ -130,9 +130,10 @@ func (t *Todo) do(f toDoFunc) error {
 	if t.Conf == nil {
 		panic("Conf cannot be empty")
 	}
-
+	var flushToken bool
+	var retryCnt int32
 retry:
-	token, err := t.getAccessToken()
+	token, err := t.getAccessToken(flushToken)
 	if err != nil {
 		return err
 	}
@@ -143,31 +144,34 @@ retry:
 	//if strings.Index(string(bytes), "errcode") > 0 {
 	_ = json.Unmarshal(bytes, &errRes)
 	if errRes.ErrorCode == 40001 {
-		if t.retry >= 3 {
+		if strings.Contains(errRes.ErrMsg, "invalid or not latest") { // token 被占用
+			flushToken = true
+		}
+		if retryCnt >= t.retry {
 			return errRes
 		}
-		t.retry++
+		retryCnt++
 
 		goto retry
 	} else if errRes.ErrorCode == 0 {
-		t.retry = 0
+		retryCnt = 0
 		return nil
 	}
 	return errRes
 }
 
 // 获取accessToken
-func (t *Todo) getAccessToken() (token store.DataVal, err error) {
+func (t *Todo) getAccessToken(flushToken bool) (token store.DataVal, err error) {
 	t.mutex.Lock()
 	defer t.mutex.Unlock()
 	defer t.store.Close()
 	apiUrl := "https://api.weixin.qq.com/cgi-bin/token"
 
-	if t.store.IsExpire(t.appType+"accessToken", t.Conf.AppID) {
+	if flushToken || t.store.IsExpire(t.appType+"accessToken", t.Conf.AppID) {
 		apiUrl += "?grant_type=client_credential&AppId=" + t.Conf.AppID + "&secret=" + t.Conf.AppSecret
 		get, _ := utils.HttpGet(apiUrl)
 		var res = store.AccessToken{}
-		token= make(store.DataVal)
+		token = make(store.DataVal)
 		err = json.Unmarshal(get, &res)
 		if err != nil {
 			return
@@ -192,8 +196,10 @@ func (t *Todo) getAccessToken() (token store.DataVal, err error) {
 //
 func (t *Todo) GetTicket() (string, error) {
 	// 判断是否过期
-	if load, err := t.store.Load(t.appType+"ticket", t.Conf.AppID); err == nil {
-		if load.IsExpire() { // 未过期
+
+	if !t.store.IsExpire(t.appType+"ticket", t.Conf.AppID) {
+		load, err := t.store.Load(t.appType+"ticket", t.Conf.AppID)
+		if err == nil {
 			return load.GetVal(), nil
 		}
 	}
@@ -207,8 +213,11 @@ func (t *Todo) GetTicket() (string, error) {
 	if res.ErrCode != 0 {
 		return "", err
 	}
-	res.SetExpire(7100)
-	res.CreateAt = time.Now().Local().Unix()
-	err = t.store.Store(t.appType+"ticket", t.Conf.AppID, &res)
+	var tk = make(store.DataVal)
+	tk.SetExpire(7100)
+	tk.SetCreateAt()
+	tk.SetVal(res.GetVal())
+	tk["type"] = "Ticket"
+	err = t.store.Store(t.appType+"ticket", t.Conf.AppID, tk)
 	return res.GetVal(), nil
 }

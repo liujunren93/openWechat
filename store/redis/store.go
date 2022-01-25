@@ -1,58 +1,102 @@
 package redis
 
 import (
+	"context"
 	"encoding/json"
-	"github.com/liujunren93/openWechat/store"
+	"errors"
+	"fmt"
+	"github.com/go-redis/redis/v8"
+	iStore "github.com/liujunren93/openWechat/store"
+	"github.com/liujunren93/openWechat/store/memory"
 	"time"
-
-	"github.com/go-redis/redis"
 )
 
-type rStore struct {
-	db        *redis.Client
-	prefix    string
-	namespace string
+type store struct {
+	db     *redis.Client
+	prefix string
+	mstore iStore.Store
 }
 
-func (r *rStore) Load(namespace, appId string) (store.Data, bool) {
-	var res val
-	get := r.db.HGet(r.buildKey(), appId)
+func NewStore(db *redis.Client, prefix string) (*store, error) {
+	ping := db.Ping(getContext())
+	if ping.Err() != nil {
+		return nil, ping.Err()
+	}
+	return &store{
+		db:     db,
+		prefix: prefix,
+		mstore: memory.NewStore(),
+	}, nil
+}
+
+func (s store) syncMem(namespace, appId string) (iStore.Data, error) {
+	get := s.db.HGet(getContext(), s.buildKey(namespace), appId)
+	if get.Err() == redis.Nil {
+		return nil, iStore.NilError
+	}
+	var data iStore.DataVal
 	bytes, err := get.Bytes()
 	if err != nil {
-		return nil, false
+		return nil, nil
 	}
-	err = json.Unmarshal(bytes, &res)
+	err = json.Unmarshal(bytes, &data)
 	if err != nil {
-		return nil, false
-	}else{
-		return res, true
+		return nil, nil
 	}
-
-
+	return data, nil
+}
+func (s store) syncDB(namespace, appId string, data iStore.Data) error {
+	marshal, err := json.Marshal(data)
+	if err != nil {
+		return err
+	}
+	return s.db.HSet(getContext(), s.buildKey(namespace), appId, marshal).Err()
 }
 
-func (r *rStore) IsExpire(namespace, appId string) bool {
-	if data, ok := r.Load(namespace, appId);ok{
+func (s store) Load(namespace, appId string) (iStore.Data, error) {
+	if load, ok := s.mstore.Load(namespace, appId); ok == nil {
+		return load, nil
+	}
+	return s.syncMem(namespace, appId)
+}
+
+func (s store) IsExpire(namespace, appId string) bool {
+	expire := s.mstore.IsExpire(namespace, appId)
+	if !expire { //未过期
+		return expire
+	}
+	data, err := s.syncMem(namespace, appId)
+	if errors.Is(err, iStore.NilError) {
 		return true
-	}else{
-		if time.Now().Unix()-data.GetCreateTime() >= data.GetExpire()-100 {
-			return true
-		}
 	}
-	return false
+	return data.IsExpire()
 }
 
-func (r *rStore) Store(namespace, appId string, val store.Data) error {
-	panic("implement me")
+func (s store) Store(namespace, appId string, val iStore.Data) error {
+	err := s.mstore.Store(namespace, appId, val)
+	if err != nil {
+		return err
+	}
+	return s.syncDB(namespace, appId, val)
 }
 
-//func (r *rStore) Store(appId string, data store.Data) {
-//	//script := ` if redis.call('hmset',%s,'data',%s,"expireIn",%d,"createdAt",%s) then redis.call('expire',%s,%d);  return 1 else 	return 0 end`
-//	//sprintf := fmt.Sprintf(script, r.buildKey(appId), data.GetVal(), data.GetExpire(), data.GetCreateTime(), r.buildKey(appId), data.GetExpire()-100)
-//	//r.db.Eval(sprintf,)
-//}
+func (s store) Close() error {
+	//if s.db == nil {
+	//	return nil
+	//}
+	//err := s.db.Close()
+	//if err == redis.ErrClosed {
+	//	return nil
+	//}
+	//return s.db.Close()
+	return nil
+}
 
-func (r *rStore) buildKey() string {
+func (s *store) buildKey(namespace string) string {
+	return fmt.Sprintf("%s:%s", s.prefix, namespace)
+}
 
-	return r.prefix + ":" + r.namespace
+func getContext() context.Context {
+	timeout, _ := context.WithTimeout(context.TODO(), time.Second*2)
+	return timeout
 }

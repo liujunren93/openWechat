@@ -6,7 +6,8 @@ import (
 	"github.com/liujunren93/openWechat/offiaccount/api/menu"
 	"github.com/liujunren93/openWechat/offiaccount/api/signature"
 	"github.com/liujunren93/openWechat/offiaccount/api/user"
-	"github.com/liujunren93/openWechat/offiaccount/api/utils"
+	"github.com/liujunren93/openWechat/offiaccount/api/utils/qrcode"
+	"github.com/liujunren93/openWechat/offiaccount/api/utils/upload"
 	"github.com/liujunren93/openWechat/store"
 	"sync"
 )
@@ -73,13 +74,27 @@ func (o *Client) Signature() *signature.Api {
 	}
 
 }
-func (o *Client) Utils() *utils.Api {
-	if v, ok := o.apiMap.Load(utils.Api{}); ok {
-		return v.(*utils.Api)
+
+func (o *Client) Utils() *upload.Api {
+	if v, ok := o.apiMap.Load(upload.Api{}); ok {
+		return v.(*upload.Api)
 	} else {
-		api := utils.NewApi(o.toDo)
-		o.apiMap.Store(utils.Api{}, api)
+		api := upload.NewApi(o.toDo)
+		o.apiMap.Store(upload.Api{}, api)
 		return api
 	}
 
 }
+
+
+func (o *Client) Qrcode() *qrcode.Api {
+	if v, ok := o.apiMap.Load(qrcode.Api{}); ok {
+		return v.(*qrcode.Api)
+	} else {
+		api := qrcode.NewApi(o.toDo)
+		o.apiMap.Store(qrcode.Api{}, api)
+		return api
+	}
+
+}
+

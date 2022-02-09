@@ -13,7 +13,7 @@ import (
 
 var client *Client
 
-func init() {
+func init1() {
 	//store := file.NewStore("tt.json")
 	newClient := redis2.NewClient(&redis2.Options{
 		Network: "tcp",
@@ -58,13 +58,7 @@ func TestSetMenu(t *testing.T) {
 	fmt.Println(err)
 }
 
-func TestSetZbMenu(t *testing.T) {
-	newMenu := menu.NewMenu()
-	newMenu.AddViewBtn("淘便宜", "tpy_btn", "http://www.sharelife.club/rim_h5//#/tpy/list", "", "")
-	newMenu.AddViewBtn("淘便宜", "tpy_btn", "http://www.sharelife.club/rim_h5//#/tpy/list", "", "")
-	err := client.MenuApi().Create(newMenu)
-	fmt.Println(err)
-}
+
 
 func TestGetMenu(t *testing.T) {
 

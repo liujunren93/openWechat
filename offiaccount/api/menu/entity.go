@@ -61,7 +61,7 @@ func (m *Menu) AddViewBtn(name, key, url, appId, pagePath string) *Menu{
 		AppID:    appId,
 		PagePath: pagePath,
 	})
-	return nil
+	return m
 }
 
 //AddScancodeWaitMsgBtn 扫码带提示

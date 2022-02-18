@@ -3,6 +3,7 @@ package qrcode
 import (
 	"encoding/json"
 	"github.com/liujunren93/openWechat/internal"
+	"net/url"
 )
 
 /**
@@ -24,6 +25,12 @@ func (a *Api) Create(qrcode Qrcode) (CreatQrcodeRes, error) {
 	if err != nil {
 		return res, err
 	}
-	return res, a.todo.ToDoFuncPost(api, &res, marshal)
+	err = a.todo.ToDoFuncPost(api, &res, marshal)
+	if err != nil {
+		return res,err
+	}
+	res.QrcodeUrl="https://mp.weixin.qq.com/cgi-bin/showqrcode?ticket="+url.QueryEscape(res.Ticket)
+	return res,nil
 }
+
 

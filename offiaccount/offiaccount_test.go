@@ -2,10 +2,11 @@ package offiAccount
 
 import (
 	"fmt"
-	redis2 "github.com/go-redis/redis/v8"
 	"github.com/liujunren93/openWechat/offiaccount/api/material"
 	"github.com/liujunren93/openWechat/offiaccount/api/menu"
-	"github.com/liujunren93/openWechat/store/redis"
+	"github.com/liujunren93/openWechat/offiaccount/api/utils/qrcode"
+	"github.com/liujunren93/openWechat/store/file"
+
 	"os"
 	"testing"
 	"time"
@@ -13,6 +14,7 @@ import (
 
 var client *Client
 
+<<<<<<< HEAD
 func init1() {
 	//store := file.NewStore("tt.json")
 	newClient := redis2.NewClient(&redis2.Options{
@@ -23,8 +25,13 @@ func init1() {
 	if err != nil {
 		panic(err)
 	}
+=======
+func init() {
+
+	store := file.NewStore("./tt.json.json")
+	//client = NewOfficialAccount("wx40a5b2247d31bddf", "5d4677b6498b90282585c573ac324a7a", store)
+>>>>>>> d7dbe017906decb07d65b45ff0640ddc73d85aa9
 	client = NewOfficialAccount("wx40a5b2247d31bddf", "5d4677b6498b90282585c573ac324a7a", store)
-	//client = NewOfficialAccount("wx40a5b2247d31bddf", "5d4677b6498b90282585c573ac324a7a", nil)
 
 }
 
@@ -62,9 +69,9 @@ func TestSetMenu(t *testing.T) {
 
 func TestGetMenu(t *testing.T) {
 
-		list, err := client.MenuApi().List()
-		//err := client.MenuApi().Create(list.ToMenu())
-		fmt.Println(list, err)
+	list, err := client.MenuApi().List()
+	//err := client.MenuApi().Create(list.ToMenu())
+	fmt.Println(list, err)
 
 }
 
@@ -76,7 +83,7 @@ func TestOffiAccount_Signature(t *testing.T) {
 }
 
 func TestOffiAccount_MaterialApi_UpTemporary(t *testing.T) {
-	readFile, err := os.Open("./tt.jpeg")
+	readFile, err := os.Open("./tt.json.jpeg")
 	fmt.Println(err)
 
 	res, err := client.MaterialApi().AddTemporary(material.NewImage(readFile, ""))
@@ -97,7 +104,7 @@ func TestOffiAccount_Material(t *testing.T) {
 	fmt.Println(img, err)
 }
 func TestOffiAccount_addMaterial(t *testing.T) {
-	open, _ := os.Open("./tt.mp4")
+	open, _ := os.Open("./tt.json.mp4")
 	img, err := client.MaterialApi().AddMaterial(material.NewVideo(open, ""),
 		map[string]string{"description": `{"title":"VIDEO_TITLE", "introduction":"INTRODUCTION"}`})
 	fmt.Println(img, err)
@@ -135,6 +142,7 @@ func TestOffiAccount_MaterialApiInfo(t *testing.T) {
 
 }
 
+
 //Ylfx1KKkztYhcz0ZQzhogei04pT46O1ZoxO1LhbcBjI
 func TestSign(t *testing.T) {
 	for {
@@ -153,3 +161,17 @@ func TestUpImage(*testing.T) {
 	client.Utils().UploadImg(file)
 
 }
+
+
+func TestOffiAccount_Qrcode(t *testing.T) {
+	create, err2 := client.Qrcode().Create(qrcode.Qrcode{
+		ExpireSeconds: 3600,
+		ActionName:    qrcode.QRLIMITSTRSCENE,
+		ActionInfo:    qrcode.ActionInfo(1,"ppx"),
+
+	})
+
+	fmt.Println(create, err2)
+
+}
+

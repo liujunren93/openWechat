@@ -1,4 +1,4 @@
-package utils
+package upload
 
 import (
 	"fmt"
@@ -35,7 +35,7 @@ func (i image) GetData() *os.File {
 }
 
 func (a Api) UploadImg(f *os.File) {
-	i := image{f:f}
+	i := image{f: f}
 	api := "https://api.weixin.qq.com/cgi-bin/media/uploadimg"
 	var data interface{}
 	 a.todo.ToDoFuncPostForm(api, &data, i,nil)

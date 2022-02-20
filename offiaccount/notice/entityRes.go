@@ -1,11 +1,15 @@
 package notice
 
+import (
+	"crypto/md5"
+	"encoding/hex"
+	"encoding/json"
+)
+
 /**
 * @Author: liujunren
 * @Date: 2022/1/28 17:05
  */
-
-
 
 //ReceivingStandardMsgReq 文本消息 接收
 type ReceivingStandardMsg struct {
@@ -23,6 +27,13 @@ type ReceivingStandardMsg struct {
 	link
 	userlocation
 	event
+}
+
+func (r ReceivingStandardMsg) UniqueKey() string {
+	hash := md5.New()
+	marshal, _ := json.Marshal(r)
+	hash.Write(marshal)
+	return hex.EncodeToString(hash.Sum(nil))
 }
 
 func (r ReceivingStandardMsg) GetMsgType() string {
@@ -52,15 +63,12 @@ func (r ReceivingStandardMsg) GetMsgType() string {
 	}
 	return ""
 }
+
 type event struct {
-	Event string `xml:"Event" json:"event,omitempty"`
+	Event    string `xml:"Event" json:"event,omitempty"`
 	EventKey string `xml:"EventKey" json:"event_key,omitempty"`
 	Ticket   string `xml:"Ticket" json:"ticket,omitempty"`
 }
-
-
-
-
 
 type text struct {
 	Content string `xml:"Content" json:"content,omitempty"`

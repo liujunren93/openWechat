@@ -37,4 +37,5 @@ type CreatQrcodeRes struct {
 	Ticket        string `json:"ticket"`
 	ExpireSeconds int    `json:"expire_seconds"`
 	Url           string `json:"url"`
+	QrcodeUrl     string `json:"qrcode_url"`
 }

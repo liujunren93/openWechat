@@ -168,7 +168,6 @@ func TestOffiAccount_Qrcode(t *testing.T) {
 		ExpireSeconds: 3600,
 		ActionName:    qrcode.QRLIMITSTRSCENE,
 		ActionInfo:    qrcode.ActionInfo(1,"ppx"),
-
 	})
 
 	fmt.Println(create, err2)

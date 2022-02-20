@@ -6,6 +6,12 @@ import (
 	"encoding/json"
 )
 
+const (
+	EventSubscribe   = "subscribe"
+	EventUnsubscribe = "unsubscribe"
+	EventSCAN        = "SCAN"
+)
+
 /**
 * @Author: liujunren
 * @Date: 2022/1/28 17:05

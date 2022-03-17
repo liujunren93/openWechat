@@ -2,10 +2,10 @@ package offiAccount
 
 import (
 	"fmt"
+
 	"github.com/liujunren93/openWechat/offiaccount/api/material"
 	"github.com/liujunren93/openWechat/offiaccount/api/menu"
 	"github.com/liujunren93/openWechat/offiaccount/api/utils/qrcode"
-	"github.com/liujunren93/openWechat/store/file"
 	"github.com/liujunren93/openWechat/store/redis"
 
 	"os"
@@ -14,7 +14,6 @@ import (
 )
 
 var client *Client
-
 
 func init1() {
 	//store := file.NewStore("tt.json")
@@ -27,14 +26,10 @@ func init1() {
 		panic(err)
 	}
 
-	client = NewOfficialAccount("wx40a5b2247d31bddf", "5d4677b6498b90282585c573ac324a7a", store)
+	client = NewOfficialAccount("", "", store)
 
 }
 
-//appId:
-//"wx40a5b2247d31bddf"
-//appSecret:
-//"5d4677b6498b90282585c573ac324a7a"
 func TestNewOfficialAccount(t *testing.T) {
 
 	fmt.Println(time.Now())
@@ -60,8 +55,6 @@ func TestSetMenu(t *testing.T) {
 	err := client.MenuApi().Create(newMenu)
 	fmt.Println(err)
 }
-
-
 
 func TestGetMenu(t *testing.T) {
 
@@ -138,7 +131,6 @@ func TestOffiAccount_MaterialApiInfo(t *testing.T) {
 
 }
 
-
 //Ylfx1KKkztYhcz0ZQzhogei04pT46O1ZoxO1LhbcBjI
 func TestSign(t *testing.T) {
 	for {
@@ -158,15 +150,13 @@ func TestUpImage(*testing.T) {
 
 }
 
-
 func TestOffiAccount_Qrcode(t *testing.T) {
 	create, err2 := client.Qrcode().Create(qrcode.Qrcode{
 		ExpireSeconds: 3600,
 		ActionName:    qrcode.QRLIMITSTRSCENE,
-		ActionInfo:    qrcode.ActionInfo(1,"ppx"),
+		ActionInfo:    qrcode.ActionInfo(1, "ppx"),
 	})
 
 	fmt.Println(create, err2)
 
 }
-

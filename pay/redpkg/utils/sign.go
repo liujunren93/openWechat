@@ -11,11 +11,11 @@ import (
 )
 
 type Signer interface {
-	GetVal() (url.Values,error)
+	GetVal() (url.Values, error)
 }
 
-func Sign(s Signer, key string)(string,error) {
-	val,err	 := s.GetVal()
+func Sign(s Signer, key string) (string, error) {
+	val, err := s.GetVal()
 
 	if err != nil {
 		return "", err
@@ -25,7 +25,7 @@ func Sign(s Signer, key string)(string,error) {
 			val.Del(k)
 		}
 	}
-	stringSignTemp :=Encode(val) + "&key=" + key
+	stringSignTemp := Encode(val) + "&key=" + key
 	return md5Up(stringSignTemp)
 
 }
@@ -36,10 +36,10 @@ func md5Up(str string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	return 	strings.ToUpper(hex.EncodeToString(hash.Sum(nil))), nil
+	return strings.ToUpper(hex.EncodeToString(hash.Sum(nil))), nil
 }
 
-func sha256Up(str,key string)(string,error)  {
+func sha256Up(str, key string) (string, error) {
 	mac := hmac.New(sha256.New, []byte(key))
 	mac.Write([]byte(str))
 	return strings.ToUpper(hex.EncodeToString(mac.Sum(nil))), nil

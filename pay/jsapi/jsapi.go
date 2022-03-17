@@ -4,13 +4,13 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
+	"time"
+
 	"github.com/liujunren93/openWechat/pay"
-	"github.com/liujunren93/openWechat/utils"
 	"github.com/wechatpay-apiv3/wechatpay-go/core"
 	"github.com/wechatpay-apiv3/wechatpay-go/services/payments/jsapi"
 	"github.com/wechatpay-apiv3/wechatpay-go/services/refunddomestic"
-	"io"
-	"time"
 )
 
 /**
@@ -78,16 +78,6 @@ func CreateOrder(c *pay.Client, ctx context.Context, req JspCreateOrderReq) (res
 		return nil, fmt.Errorf("refund http errCode:%d,data:%v", apiResult.Response.StatusCode, string(all))
 	}
 	return payment, err
-}
-
-func DecryptAES256GCM(aesKey, associatedData, nonce, ciphertext string) (PayResult, error) {
-	var res PayResult
-	gcm, err := utils.DecryptAES256GCM(aesKey, associatedData, nonce, ciphertext)
-	if err != nil {
-		return res, err
-	}
-	err = json.Unmarshal(gcm, &res)
-	return res, err
 }
 
 type RefundReq struct {

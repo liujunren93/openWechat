@@ -3,28 +3,29 @@ package normal
 import (
 	"encoding/xml"
 	"errors"
-	"github.com/liujunren93/openWechat/pay/redpkg"
-	"github.com/liujunren93/openWechat/pay/redpkg/utils"
 	"net/url"
+
+	"github.com/liujunren93/openWechat/pay/redpkg/utils"
+	puUtils "github.com/liujunren93/openWechat/utils"
 )
 
 type Normal struct {
-	XMLName     xml.Name        `xml:"xml"`
-	Sign        redpkg.CDATAStr `xml:"sign,omitempty"`
-	MchBillno   redpkg.CDATAStr `xml:"mch_billno,omitempty"`
-	MchId       redpkg.CDATAStr `xml:"mch_id,omitempty"`
-	Wxappid     redpkg.CDATAStr `xml:"wxappid,omitempty"`
-	SendName    redpkg.CDATAStr `xml:"send_name"`
-	ReOpenid    redpkg.CDATAStr `xml:"re_openid,omitempty"`
-	TotalAmount redpkg.CDATAInt `xml:"total_amount,omitempty"`
-	TotalNum    redpkg.CDATAInt `xml:"total_num,omitempty"`
-	Wishing     redpkg.CDATAStr `xml:"wishing,omitempty"`
-	ClientIp    redpkg.CDATAStr `xml:"client_ip,omitempty"`
-	ActName     redpkg.CDATAStr `xml:"act_name,omitempty"`
-	Remark      redpkg.CDATAStr `xml:"remark,omitempty"`
-	SceneId     redpkg.CDATAStr `xml:"scene_id,omitempty"`
-	NonceStr    redpkg.CDATAStr `xml:"nonce_str,omitempty"`
-	RiskInfo    redpkg.CDATAStr `xml:"risk_info,omitempty"`
+	XMLName     xml.Name         `xml:"xml"`
+	Sign        puUtils.CDATAStr `xml:"sign,omitempty"`
+	MchBillno   puUtils.CDATAStr `xml:"mch_billno,omitempty"`
+	MchId       puUtils.CDATAStr `xml:"mch_id,omitempty"`
+	Wxappid     puUtils.CDATAStr `xml:"wxappid,omitempty"`
+	SendName    puUtils.CDATAStr `xml:"send_name"`
+	ReOpenid    puUtils.CDATAStr `xml:"re_openid,omitempty"`
+	TotalAmount puUtils.CDATAInt `xml:"total_amount,omitempty"`
+	TotalNum    puUtils.CDATAInt `xml:"total_num,omitempty"`
+	Wishing     puUtils.CDATAStr `xml:"wishing,omitempty"`
+	ClientIp    puUtils.CDATAStr `xml:"client_ip,omitempty"`
+	ActName     puUtils.CDATAStr `xml:"act_name,omitempty"`
+	Remark      puUtils.CDATAStr `xml:"remark,omitempty"`
+	SceneId     puUtils.CDATAStr `xml:"scene_id,omitempty"`
+	NonceStr    puUtils.CDATAStr `xml:"nonce_str,omitempty"`
+	RiskInfo    puUtils.CDATAStr `xml:"risk_info,omitempty"`
 }
 
 func (n Normal) GetVal() (url.Values, error) {
@@ -65,6 +66,6 @@ func (n *Normal) DoSign(signKey string) error {
 	if err != nil {
 		return err
 	}
-	n.Sign = redpkg.CDATAStr(sign)
+	n.Sign = puUtils.CDATAStr(sign)
 	return nil
 }

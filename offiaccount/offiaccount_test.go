@@ -6,7 +6,6 @@ import (
 	"github.com/liujunren93/openWechat/offiaccount/api/material"
 	"github.com/liujunren93/openWechat/offiaccount/api/menu"
 	"github.com/liujunren93/openWechat/offiaccount/api/utils/qrcode"
-	"github.com/liujunren93/openWechat/store/redis"
 
 	"os"
 	"testing"
@@ -15,18 +14,18 @@ import (
 
 var client *Client
 
-func init1() {
+func init() {
 	//store := file.NewStore("tt.json")
-	newClient := redis2.NewClient(&redis2.Options{
-		Network: "tcp",
-		Addr:    "node1:6379",
-	})
-	store, err := redis.NewStore(newClient, "test")
-	if err != nil {
-		panic(err)
-	}
-
-	client = NewOfficialAccount("", "", store)
+	// newClient := redis2.NewClient(&redis2.Options{
+	// 	Network: "tcp",
+	// 	Addr:    "node1:6379",
+	// })
+	// store, err := redis.NewStore(newClient, "test")
+	// if err != nil {
+	// 	panic(err)
+	// }
+	fmt.Println(1111)
+	client = NewOfficialAccount("wxa3c6a833afddef99", "e1fab4761130cc05a016338c8c3c5f0f", nil)
 
 }
 

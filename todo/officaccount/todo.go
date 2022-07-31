@@ -1,26 +1,28 @@
-package internal
+package officaccount
 
 import (
 	"encoding/json"
-	"github.com/liujunren93/openWechat/store"
-	"github.com/liujunren93/openWechat/store/memory"
-	"github.com/liujunren93/openWechat/utils"
 	"log"
 	"net/url"
 	"reflect"
 	"strings"
 	"sync"
+
+	"github.com/liujunren93/openWechat/store"
+	"github.com/liujunren93/openWechat/store/memory"
+	"github.com/liujunren93/openWechat/todo"
+	"github.com/liujunren93/openWechat/utils"
 )
 
 type Todo struct {
 	retry   int32
 	mutex   sync.RWMutex
-	Conf    *Config
+	Conf    *todo.Config
 	store   store.Store
 	appType string
 }
 
-func NewTodo(conf *Config, appType string) *Todo {
+func NewTodo(conf *todo.Config, appType string) *Todo {
 	return &Todo{
 		retry:   3,
 		mutex:   sync.RWMutex{},
@@ -33,8 +35,6 @@ func NewTodo(conf *Config, appType string) *Todo {
 func (t *Todo) SetStore(store store.Store) {
 	t.store = store
 }
-
-type toDoFunc func(token string) ([]byte, error)
 
 func buildApi(api string, token string, kv []string) string {
 	var val = make(url.Values)
@@ -126,7 +126,7 @@ func (t *Todo) ToDoFuncPost(api string, res interface{}, data []byte, kv ...stri
 }
 
 func (t *Todo) do(f toDoFunc) error {
-	var errRes *ErrorRes
+	var errRes *todo.ErrorRes
 	if t.Conf == nil {
 		panic("Conf cannot be empty")
 	}

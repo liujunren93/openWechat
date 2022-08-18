@@ -2,16 +2,17 @@ package menu
 
 import (
 	"encoding/json"
-	"github.com/liujunren93/openWechat/internal"
+
+	"github.com/liujunren93/openWechat/todo/officialAccount"
 )
 
 type Api struct {
-	todo *internal.Todo
-}
-func NewApi(todo *internal.Todo) *Api {
-	return &Api{todo: todo}
+	todo *officialAccount.Todo
 }
 
+func NewApi(todo *officialAccount.Todo) *Api {
+	return &Api{todo: todo}
+}
 
 func (a *Api) List() (*resMenu, error) {
 	var res resMenu

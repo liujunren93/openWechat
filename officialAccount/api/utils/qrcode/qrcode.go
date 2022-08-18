@@ -2,8 +2,9 @@ package qrcode
 
 import (
 	"encoding/json"
-	"github.com/liujunren93/openWechat/internal"
 	"net/url"
+
+	"github.com/liujunren93/openWechat/todo/officialAccount"
 )
 
 /**
@@ -11,10 +12,10 @@ import (
 * @Date: 2022/1/28 14:30
  */
 type Api struct {
-	todo *internal.Todo
+	todo *officialAccount.Todo
 }
 
-func NewApi(todo *internal.Todo) *Api {
+func NewApi(todo *officialAccount.Todo) *Api {
 	return &Api{todo: todo}
 }
 
@@ -27,10 +28,8 @@ func (a *Api) Create(qrcode Qrcode) (CreatQrcodeRes, error) {
 	}
 	err = a.todo.ToDoFuncPost(api, &res, marshal)
 	if err != nil {
-		return res,err
+		return res, err
 	}
-	res.QrcodeUrl="https://mp.weixin.qq.com/cgi-bin/showqrcode?ticket="+url.QueryEscape(res.Ticket)
-	return res,nil
+	res.QrcodeUrl = "https://mp.weixin.qq.com/cgi-bin/showqrcode?ticket=" + url.QueryEscape(res.Ticket)
+	return res, nil
 }
-
-

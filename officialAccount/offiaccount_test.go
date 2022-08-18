@@ -1,11 +1,11 @@
-package offiAccount
+package officialAccount
 
 import (
 	"fmt"
 
-	"github.com/liujunren93/openWechat/offiaccount/api/material"
-	"github.com/liujunren93/openWechat/offiaccount/api/menu"
-	"github.com/liujunren93/openWechat/offiaccount/api/utils/qrcode"
+	"github.com/liujunren93/openWechat/officialAccount/api/material"
+	"github.com/liujunren93/openWechat/officialAccount/api/menu"
+	"github.com/liujunren93/openWechat/officialAccount/api/utils/qrcode"
 
 	"os"
 	"testing"
@@ -25,7 +25,7 @@ func init() {
 	// 	panic(err)
 	// }
 	fmt.Println(1111)
-	client = NewOfficialAccount("wxa3c6a833afddef99", "e1fab4761130cc05a016338c8c3c5f0f", nil)
+	client = NewOfficialAccount("wxc0f32e9fab6d06c9", "15ca38c49b2dfbcf1d1d9f4fc22efa2d", nil)
 
 }
 
@@ -63,14 +63,14 @@ func TestGetMenu(t *testing.T) {
 
 }
 
-func TestOffiAccount_Signature(t *testing.T) {
+func TestofficialAccount_Signature(t *testing.T) {
 	time.Sleep(time.Second)
 	signature, err := client.Signature().Signature("111")
 	fmt.Println(signature, err)
 
 }
 
-func TestOffiAccount_MaterialApi_UpTemporary(t *testing.T) {
+func TestofficialAccount_MaterialApi_UpTemporary(t *testing.T) {
 	readFile, err := os.Open("./tt.json.jpeg")
 	fmt.Println(err)
 
@@ -80,24 +80,24 @@ func TestOffiAccount_MaterialApi_UpTemporary(t *testing.T) {
 	}
 	fmt.Printf("%#v", res)
 }
-func TestOffiAccount_MaterialApi_UploadImg(t *testing.T) {
+func TestofficialAccount_MaterialApi_UploadImg(t *testing.T) {
 	open, _ := os.Open("./timg.jpeg")
 	img, err := client.MaterialApi().UploadImg(open)
 	fmt.Println(img, err)
 }
 
-func TestOffiAccount_Material(t *testing.T) {
+func TestofficialAccount_Material(t *testing.T) {
 
 	img, err := client.MaterialApi().BatchGetMaterial("", 0, 10)
 	fmt.Println(img, err)
 }
-func TestOffiAccount_addMaterial(t *testing.T) {
+func TestofficialAccount_addMaterial(t *testing.T) {
 	open, _ := os.Open("./tt.json.mp4")
 	img, err := client.MaterialApi().AddMaterial(material.NewVideo(open, ""),
 		map[string]string{"description": `{"title":"VIDEO_TITLE", "introduction":"INTRODUCTION"}`})
 	fmt.Println(img, err)
 }
-func TestOffiAccount_MaterialApi_AddNews(t *testing.T) {
+func TestofficialAccount_MaterialApi_AddNews(t *testing.T) {
 	news, err := client.MaterialApi().AddNews(material.News{
 		Title:              "ttt",
 		ThumbMediaID:       "Ylfx1KKkztYhcz0ZQzhogZ7oZ-nyaci-h2krZYPUPy0",
@@ -124,7 +124,7 @@ func TestOffiAccount_MaterialApi_AddNews(t *testing.T) {
 }
 
 //Ylfx1KKkztYhcz0ZQzhogei04pT46O1ZoxO1LhbcBjI
-func TestOffiAccount_MaterialApiInfo(t *testing.T) {
+func TestofficialAccount_MaterialApiInfo(t *testing.T) {
 	info, err := client.MaterialApi().MaterialInfo("cmy4CTVC2HUAA75tQFl9nRIFeG9R9k2Ff0nN6uU2zaM")
 	fmt.Println(info, err)
 
@@ -149,7 +149,7 @@ func TestUpImage(*testing.T) {
 
 }
 
-func TestOffiAccount_Qrcode(t *testing.T) {
+func TestofficialAccount_Qrcode(t *testing.T) {
 	create, err2 := client.Qrcode().Create(qrcode.Qrcode{
 		ExpireSeconds: 3600,
 		ActionName:    qrcode.QRLIMITSTRSCENE,

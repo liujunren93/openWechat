@@ -1,35 +1,36 @@
-package offiAccount
+package officialAccount
 
 import (
-	"github.com/liujunren93/openWechat/internal"
-	"github.com/liujunren93/openWechat/offiaccount/api/material"
-	"github.com/liujunren93/openWechat/offiaccount/api/menu"
-	"github.com/liujunren93/openWechat/offiaccount/api/signature"
-	"github.com/liujunren93/openWechat/offiaccount/api/user"
-	"github.com/liujunren93/openWechat/offiaccount/api/utils/qrcode"
-	"github.com/liujunren93/openWechat/offiaccount/api/utils/upload"
-	"github.com/liujunren93/openWechat/store"
 	"sync"
+
+	"github.com/liujunren93/openWechat/officialAccount/api/material"
+	"github.com/liujunren93/openWechat/officialAccount/api/menu"
+	"github.com/liujunren93/openWechat/officialAccount/api/message/template"
+	"github.com/liujunren93/openWechat/officialAccount/api/signature"
+	"github.com/liujunren93/openWechat/officialAccount/api/user"
+	"github.com/liujunren93/openWechat/officialAccount/api/utils/qrcode"
+	"github.com/liujunren93/openWechat/officialAccount/api/utils/upload"
+	"github.com/liujunren93/openWechat/store"
+	"github.com/liujunren93/openWechat/todo"
+	"github.com/liujunren93/openWechat/todo/officialAccount"
 )
 
 type Client struct {
-	toDo   *internal.Todo
+	toDo   *officialAccount.Todo
 	apiMap sync.Map
 }
 
 func NewOfficialAccount(appId, AppSecret string, s store.Store) *Client {
-	todo := internal.NewTodo(&internal.Config{
+	todo := officialAccount.NewTodo(&todo.Config{
 		AppID:     appId,
 		AppSecret: AppSecret,
-	},"offiaccount")
+	}, "officialAccount")
 	if s != nil {
 		todo.SetStore(s)
 	}
 	return &Client{toDo: todo}
 
 }
-
-
 
 //UserApi 用户相关
 func (o *Client) UserApi() *user.Api {
@@ -86,7 +87,6 @@ func (o *Client) Utils() *upload.Api {
 
 }
 
-
 func (o *Client) Qrcode() *qrcode.Api {
 	if v, ok := o.apiMap.Load(qrcode.Api{}); ok {
 		return v.(*qrcode.Api)
@@ -98,3 +98,13 @@ func (o *Client) Qrcode() *qrcode.Api {
 
 }
 
+func (o *Client) MessageTemplate() *template.Api {
+	if v, ok := o.apiMap.Load(template.Api{}); ok {
+		return v.(*template.Api)
+	} else {
+		api := template.NewApi(o.toDo)
+		o.apiMap.Store(template.Api{}, api)
+		return api
+	}
+
+}

@@ -1,3 +1,3 @@
 package todo
 
-type toDoFunc func(token string) ([]byte, error)
+type ToDoFunc func(token string) ([]byte, error)

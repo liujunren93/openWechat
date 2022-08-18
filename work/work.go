@@ -1,7 +1,6 @@
 package work
 
 import (
-	"github.com/liujunren93/openWechat/internal"
 	"github.com/liujunren93/openWechat/store"
 	"github.com/liujunren93/openWechat/store/memory"
 )
@@ -19,4 +18,3 @@ func NewOfficialAccount(appId, AppSecret string, s store.Store) *Client {
 	return &Client{toDo: &todo}
 
 }
-

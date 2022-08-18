@@ -1,4 +1,4 @@
-package officaccount
+package officialAccount
 
 import (
 	"encoding/json"
@@ -125,7 +125,7 @@ func (t *Todo) ToDoFuncPost(api string, res interface{}, data []byte, kv ...stri
 
 }
 
-func (t *Todo) do(f toDoFunc) error {
+func (t *Todo) do(f todo.ToDoFunc) error {
 	var errRes *todo.ErrorRes
 	if t.Conf == nil {
 		panic("Conf cannot be empty")

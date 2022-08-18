@@ -3,16 +3,17 @@ package user
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/liujunren93/openWechat/internal"
-	"github.com/liujunren93/openWechat/utils"
 	"net/url"
+
+	"github.com/liujunren93/openWechat/todo/officialAccount"
+	"github.com/liujunren93/openWechat/utils"
 )
 
 type Api struct {
-	todo *internal.Todo
+	todo *officialAccount.Todo
 }
 
-func NewApi(todo *internal.Todo) *Api {
+func NewApi(todo *officialAccount.Todo) *Api {
 	return &Api{todo: todo}
 }
 
@@ -21,7 +22,7 @@ func (a *Api) GetAccessToken(code string) (res *AccessTokenRes, err error) {
 	api := "https://api.weixin.qq.com/sns/oauth2/access_token?%s"
 	apiQuery := url.Values{}
 	apiQuery.Set("appid", a.todo.Conf.AppID)
-	apiQuery.Set("secret",  a.todo.Conf.AppSecret)
+	apiQuery.Set("secret", a.todo.Conf.AppSecret)
 	apiQuery.Set("code", code)
 	apiQuery.Set("grant_type", "authorization_code")
 	api = fmt.Sprintf(api, apiQuery.Encode())
@@ -37,9 +38,8 @@ func (a *Api) GetAccessToken(code string) (res *AccessTokenRes, err error) {
 	return res, err
 }
 
-
 //GetUserInfo 用户详情unionid
-func (a *AccessTokenRes)Info() (res *SnsInfoRes, err error) {
+func (a *AccessTokenRes) Info() (res *SnsInfoRes, err error) {
 	api := "https://api.weixin.qq.com/sns/userinfo?%s"
 	apiQuery := url.Values{}
 	apiQuery.Set("access_token", a.AccessToken)

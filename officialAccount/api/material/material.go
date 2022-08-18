@@ -3,15 +3,16 @@ package material
 import (
 	"bytes"
 	"encoding/json"
-	"github.com/liujunren93/openWechat/internal"
 	"os"
+
+	"github.com/liujunren93/openWechat/todo/officialAccount"
 )
 
 type Api struct {
-	todo *internal.Todo
+	todo *officialAccount.Todo
 }
 
-func NewApi(todo *internal.Todo) *Api {
+func NewApi(todo *officialAccount.Todo) *Api {
 	return &Api{todo: todo}
 }
 

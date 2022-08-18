@@ -1,6 +1,6 @@
 package user
 
-import "github.com/liujunren93/openWechat/offiaccount/api"
+import "github.com/liujunren93/openWechat/officialAccount/api"
 
 type AccessTokenRes struct {
 	AccessToken  string `json:"access_token"`

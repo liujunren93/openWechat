@@ -87,4 +87,4 @@ func (c *Client) Refund(ctx context.Context, transactionId, orderCode, outRefund
 	})
 }
 
-func NewRedPkgClient()
+func NewRedPkgClient() {}

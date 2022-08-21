@@ -2,12 +2,13 @@ package notice
 
 import (
 	"encoding/xml"
-	"github.com/liujunren93/openWechat/types"
 	"time"
+
+	"github.com/liujunren93/openWechat/types"
 )
 
-
 type passiveUserReplyMessage struct {
+	XMLName      xml.Name    `xml:"xml"`
 	ToUserName   types.CDATA `xml:"ToUserName"`
 	FromUserName types.CDATA `xml:"FromUserName"`
 	CreateTime   int64       `xml:"CreateTime"`
@@ -15,11 +16,9 @@ type passiveUserReplyMessage struct {
 }
 
 func (m *passiveUserReplyMessage) SetBase(toUserName, FromUserName, MediaId string) {
-	*m = passiveUserReplyMessage{
-		ToUserName:   types.CDATA{Text: toUserName},
-		FromUserName: types.CDATA{Text: FromUserName},
-		CreateTime:   time.Now().Local().Unix(),
-	}
+	m.ToUserName = types.CDATA{Text: toUserName}
+	m.FromUserName = types.CDATA{Text: FromUserName}
+	m.CreateTime = time.Now().Local().Unix()
 }
 
 //ReplyText 文字
@@ -78,8 +77,33 @@ type ReplyMusic struct {
 // 图文
 type ReplyNews struct {
 	passiveUserReplyMessage
-	ArticleCount int      `xml:"ArticleCount"`
-	Articles     articles `xml:"articles"`
+	ArticleCount int       `xml:"ArticleCount"`
+	Articles     *articles `xml:"Articles"`
+}
+
+func NewReplyNews() *ReplyNews {
+	return &ReplyNews{
+		passiveUserReplyMessage: passiveUserReplyMessage{
+			MsgType: types.CDATA{Text: "news"},
+		},
+		ArticleCount: 0,
+		Articles:     &articles{},
+	}
+
+}
+
+func (r *ReplyNews) AddItem(title, description, picUrl, url string) {
+	r.ArticleCount++
+	if r.Articles == nil {
+		r.Articles = &articles{}
+	}
+
+	r.Articles.Item = append(r.Articles.Item, ReplyNewsItem{
+		Title:       types.CDATA{Text: title},
+		Description: types.CDATA{Text: description},
+		PicUrl:      types.CDATA{Text: picUrl},
+		Url:         types.CDATA{Text: url},
+	})
 }
 
 type articles struct {
@@ -87,8 +111,9 @@ type articles struct {
 }
 
 type ReplyNewsItem struct {
+	XMLName     xml.Name    `xml:"item"`
 	Title       types.CDATA `xml:"Title"`
 	Description types.CDATA `xml:"Description"`
 	PicUrl      types.CDATA `xml:"PicUrl"`
-	Url         types.CDATA `xml:"url"`
+	Url         types.CDATA `xml:"Url"`
 }
